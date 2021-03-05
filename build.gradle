@@ -5,6 +5,7 @@
 plugins {
     id 'java'
     id 'distribution'
+    id 'checkstyle'
 }
 
 repositories {
@@ -20,11 +21,6 @@ repositories {
     maven {
         url = uri('https://repo.maven.apache.org/maven2')
     }
-}
-
-configurations {
-    prestoDB
-    prestoSQL
 }
 
 dependencies {
@@ -80,14 +76,6 @@ task getHomeDir {
     doLast {
         println gradle.gradleHomeDir
     }
-}
-
-jar {
-    from project.configurations.runtime, configurations.prestoDB
-}
-
-task prestoSQLJar(type: Jar) {
-    from project.configurations.runtime, configurations.prestoSQL
 }
 
 plugins.withType(DistributionPlugin) {
