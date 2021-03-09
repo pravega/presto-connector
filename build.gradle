@@ -8,6 +8,8 @@ plugins {
     id 'checkstyle'
 }
 
+apply from: "$rootDir/gradle/checkstyle.gradle"
+
 repositories {
     mavenLocal()
     maven {
