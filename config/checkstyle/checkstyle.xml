@@ -3,8 +3,8 @@
         "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
         "http://checkstyle.sourceforge.net/dtds/configuration_1_3.dtd">
 <module name="Checker">
-    <module name="RegexpHeader">
-        <property name="header" value="/\*\n \* Copyright \(c\) Pravega Authors\."/>
+    <module name="Header">
+        <property name="headerFile" value="HEADER" />
     </module>
     <module name="FileTabCharacter" />
     <module name="NewlineAtEndOfFile">
