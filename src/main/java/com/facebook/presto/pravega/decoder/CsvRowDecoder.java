@@ -13,3 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package com.facebook.presto.pravega.decoder;
+
+import com.facebook.presto.pravega.DelimRecordValue;
+import com.facebook.presto.pravega.PravegaRecordValue;
+
+public class CsvRowDecoder
+        implements EventDecoder
+{
+    @Override
+    public boolean decodeEvent(DecodableEvent event, PravegaRecordValue record)
+    {
+        ((DelimRecordValue) record).setBuf(event.asBytes());
+        return true;
+    }
+}

@@ -13,3 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package com.facebook.presto.pravega;
+
+import io.airlift.slice.Slice;
+
+public interface PravegaRecordValue
+{
+    void decode();
+
+    boolean decoded();
+
+    boolean isNull(int field, int ordinalPosition);
+
+    long getLong(int field, int ordinalPosition);
+
+    double getDouble(int field, int ordinalPosition);
+
+    boolean getBoolean(int field, int ordinalPosition);
+
+    Slice getSlice(int field, int ordinalPosition);
+}

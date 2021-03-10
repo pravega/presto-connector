@@ -13,3 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package com.facebook.presto.pravega.decoder;
+
+import io.pravega.client.stream.Serializer;
+
+// deserialize using externally provided schema or using SR+SerializerConfig
+public abstract class KVSerializer<T>
+        implements Serializer<T>
+{
+    // create an event that can be passed down to decoders
+    public abstract DecodableEvent toEvent(Object obj);
+}

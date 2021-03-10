@@ -13,3 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package com.facebook.presto.pravega.decoder;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+public class JsonEvent
+        extends DecodableEvent
+{
+    private final JsonNode tree;
+
+    public JsonEvent(Object object)
+    {
+        this.tree = (JsonNode) object;
+    }
+
+    public JsonNode asJson()
+    {
+        return tree;
+    }
+
+    @Override
+    protected int size()
+    {
+        return tree.size();
+    }
+}

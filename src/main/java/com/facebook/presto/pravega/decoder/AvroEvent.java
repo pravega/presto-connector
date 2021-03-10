@@ -13,3 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package com.facebook.presto.pravega.decoder;
+
+import org.apache.avro.generic.GenericRecord;
+
+public class AvroEvent
+        extends DecodableEvent
+{
+    private final GenericRecord record;
+
+    public AvroEvent(Object object)
+    {
+        this.record = (GenericRecord) object;
+    }
+
+    public GenericRecord asAvro()
+    {
+        return record;
+    }
+
+    @Override
+    protected int size()
+    {
+        return 0;
+    }
+}

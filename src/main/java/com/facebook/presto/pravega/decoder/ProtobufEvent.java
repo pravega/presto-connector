@@ -13,3 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package com.facebook.presto.pravega.decoder;
+
+import com.google.protobuf.DynamicMessage;
+
+public class ProtobufEvent
+        extends DecodableEvent
+{
+    private final DynamicMessage message;
+
+    public ProtobufEvent(Object object)
+    {
+        this.message = (DynamicMessage) object;
+    }
+
+    public DynamicMessage asProtobuf()
+    {
+        return message;
+    }
+
+    @Override
+    protected int size()
+    {
+        return 0;
+    }
+}

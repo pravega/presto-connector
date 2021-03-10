@@ -1,0 +1,102 @@
+/*
+ * Build gradle file for the Pravega connector
+ */
+
+plugins {
+    id 'java'
+    id 'distribution'
+    id 'checkstyle'
+}
+
+apply from: "$rootDir/gradle/checkstyle.gradle"
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://oss.jfrog.org/jfrog-dependencies')
+    }
+
+    maven {
+        url = uri('https://jitpack.io')
+    }
+
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2')
+    }
+}
+
+dependencies {
+    compile 'com.facebook.airlift:bootstrap:0.191'
+    compile 'com.facebook.airlift:json:0.191'
+    compile 'com.facebook.airlift:log:0.191'
+    compile 'com.facebook.airlift:configuration:0.191'
+    compile 'com.google.guava:guava:26.0-jre'
+    compile 'com.google.inject:guice:4.2.0'
+    compile 'javax.validation:validation-api:1.1.0.Final'
+    compile 'javax.inject:javax.inject:1'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.10.0'
+    compile 'io.pravega:pravega-client:0.9.0-2705.09f82eb-SNAPSHOT'
+    compile 'io.pravega:pravega-common:0.9.0-2705.09f82eb-SNAPSHOT'
+    compile 'io.pravega:pravega-shared-protocol:0.9.0-2705.09f82eb-SNAPSHOT'
+    compile 'com.google.protobuf:protobuf-java:3.11.4'
+    compile 'com.github.everit-org.json-schema:org.everit.json.schema:1.12.1'
+    compile 'org.apache.avro:avro:1.8.1'
+    compile 'org.apache.commons:commons-lang3:3.7'
+    compile 'io.pravega:schemaregistry-contract:0.2.0-50.f1b6734-SNAPSHOT'
+    compile 'io.pravega:schemaregistry-common:0.2.0-50.f1b6734-SNAPSHOT'
+    compile 'io.pravega:schemaregistry-client:0.2.0-50.f1b6734-SNAPSHOT'
+    compile 'io.pravega:schemaregistry-serializers:0.2.0-50.f1b6734-SNAPSHOT'
+    compile 'io.pravega:schemaregistry-serializers-shared:0.2.0-50.f1b6734-SNAPSHOT'
+    compile 'io.pravega:schemaregistry-serializers-json:0.2.0-50.f1b6734-SNAPSHOT'
+
+    compile 'com.facebook.presto:presto-main:0.247'
+    compile 'com.facebook.presto:presto-record-decoder:0.247'
+    compile 'com.facebook.presto:presto-spi:0.247'
+    compile 'com.facebook.presto:presto-common:0.247'
+
+    runtimeOnly 'io.airlift:joda-to-java-time-bridge:3'
+    runtimeOnly 'com.facebook.airlift:log-manager:0.191'
+    runtimeOnly 'org.apache.zookeeper:zookeeper:3.5.7'
+    runtimeOnly 'com.101tec:zkclient:0.10'
+
+    testImplementation 'com.facebook.presto:presto-tests:0.247'
+    testImplementation 'org.testng:testng:7.3.0'
+    testImplementation 'com.facebook.airlift:testing:0.191'
+
+    compileOnly 'io.airlift:slice:0.38'
+    compileOnly 'io.airlift:units:1.3'
+    compileOnly 'com.fasterxml.jackson.core:jackson-annotations:2.10.0'
+    compileOnly 'org.openjdk.jol:jol-core:0.2'
+}
+
+group = 'com.facebook.presto'
+version = '0.1.0'
+description = 'Pravega SQL :: Pravega PrestoDB Connector'
+sourceCompatibility = '1.8'
+
+task getHomeDir {
+    doLast {
+        println gradle.gradleHomeDir
+    }
+}
+
+plugins.withType(DistributionPlugin) {
+    distTar {
+        compression = Compression.GZIP
+        extension = 'tar.gz'
+    }
+}
+
+distributions {
+    main {
+        contents {
+            distributionBaseName = 'pravega'
+            from jar
+            from(project.configurations.runtime)
+        }
+    }
+}
+
+test {
+    useTestNG()
+}
