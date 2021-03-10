@@ -24,7 +24,7 @@ Pravega Presto connector is a standard Gradle project. Simply run the following 
 
     ./gradlew clean build
 
-On the first build, Gradle will download all the dependencies from various locations of the internet and cache them in the local repository (`~/.gradle/caches`), which can take a considerable amount of time. Subsequent builds will be faster.
+On the first build, Gradle will download all the dependencies from various locations of the internet and cache them in the local repository (`~/.gradle / caches `), which can take a considerable amount of time.  Subsequent builds will be faster.  
 
 Pravega Presto connector has a set of unit tests that can take several minutes to run. You can run the tests using this command:
 
@@ -34,10 +34,10 @@ Pravega Presto connector has a set of unit tests that can take several minutes t
 
 The plugin file that gets created during the build process is: ./build/distributions/pravega-<VERSION>.tar.gz.  This file can be untar'd in the /usr/lib/presto/lib/plugins directory of a running Presto installation. Like all Presto connectors, the Pravega Presto connector uses a properties files to point to the storage provider (e.g. Pravega controller).  Create a properties file similar to below, but replace the # characters with the appropriate IP address of the Pravega Controller and the Pravega Schema Registry server of your configuration.
 
-[root@lrmk226 ~]# cat /etc/presto/catalog/pravega.properties
-connector.name=pravega
-pravega.controller=tcp://##.###.###.###:9090
-pravega.schema-registry=http://##.###.###.###:9092
+    [root@lrmk226 ~]# cat /etc/presto/catalog/pravega.properties
+    connector.name=pravega
+    pravega.controller=tcp://##.###.###.###:9090
+    pravega.schema-registry=http://##.###.###.###:9092
 
 ## Running Presto in your IDE
 
@@ -58,18 +58,18 @@ Use the following options to create a run configuration that runs the Presto ser
 
 The working directory should be manually created and set to where the configuration properties files are located on your host.
 
-[root@lrmk226 ~]# find /root/presto -ls
-537429121    0 drwxr-xr-x   4 root     root           28 Mar 10 10:40 /root/presto
-537429123    0 drwxr-xr-x   4 root     root           97 Mar  2 17:12 /root/presto/etc
-805328026    0 drwxr-xr-x   2 root     root           32 Mar  3 15:58 /root/presto/etc/catalog
-816318053    4 -rw-r--r--   1 root     root          119 Mar  3 15:58 /root/presto/etc/catalog/pravega.properties
-272367596    0 drwxr-xr-x   2 root     root            6 Mar  2 17:04 /root/presto/etc/ecs
-537429402    4 -rw-r--r--   1 root     root          854 Mar  2 17:10 /root/presto/etc/config.properties
-537429389    4 -rw-r--r--   1 root     root          351 Mar  2 17:11 /root/presto/etc/jvm.config
-537435775    4 -rw-r--r--   1 root     root          378 Mar  2 17:12 /root/presto/etc/log.properties
-575879    0 drwxr-xr-x   3 root     root           17 Mar  2 17:17 /root/presto/var
-268833640    0 drwxr-xr-x   2 root     root           30 Mar 10 10:42 /root/presto/var/log
-272373839   12 -rw-r--r--   1 root     root        11230 Mar 10 10:42 /root/presto/var/log/http-request.log
+    [root@lrmk226 ~]# find /root/presto -ls
+    537429121    0 drwxr-xr-x   4 root     root           28 Mar 10 10:40 /root/presto
+    537429123    0 drwxr-xr-x   4 root     root           97 Mar  2 17:12 /root/presto/etc
+    805328026    0 drwxr-xr-x   2 root     root           32 Mar  3 15:58 /root/presto/etc/catalog
+    816318053    4 -rw-r--r--   1 root     root          119 Mar  3 15:58 /root/presto/etc/catalog/pravega.properties
+    272367596    0 drwxr-xr-x   2 root     root            6 Mar  2 17:04 /root/presto/etc/ecs
+    537429402    4 -rw-r--r--   1 root     root          854 Mar  2 17:10 /root/presto/etc/config.properties
+    537429389    4 -rw-r--r--   1 root     root          351 Mar  2 17:11 /root/presto/etc/jvm.config
+    537435775    4 -rw-r--r--   1 root     root          378 Mar  2 17:12 /root/presto/etc/log.properties
+    575879    0 drwxr-xr-x   3 root     root           17 Mar  2 17:17 /root/presto/var
+    268833640    0 drwxr-xr-x   2 root     root           30 Mar 10 10:42 /root/presto/var/log
+    272373839   12 -rw-r--r--   1 root     root        11230 Mar 10 10:42 /root/presto/var/log/http-request.log
 
 Create the pravega.properties file as previously described.
 
