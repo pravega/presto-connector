@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.facebook.presto.pravega;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -46,6 +45,14 @@ public class PravegaStreamFieldGroup
         this.mapping = mapping;
         this.dataSchema = requireNonNull(dataSchema, "dataSchema is null");
         this.fields = fields;
+    }
+
+    public PravegaStreamFieldGroup(PravegaStreamFieldGroup fieldGroup, String dataSchema, List<PravegaStreamFieldDescription> fields)
+    {
+        this.dataFormat = fieldGroup.dataFormat;
+        this.mapping = fieldGroup.mapping;
+        this.dataSchema = Optional.of(dataSchema);
+        this.fields = Optional.of(fields);
     }
 
     @JsonProperty

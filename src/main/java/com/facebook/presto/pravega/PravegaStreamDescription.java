@@ -57,6 +57,16 @@ public class PravegaStreamDescription
         this.event = requireNonNull(event, "message is null");
     }
 
+    public PravegaStreamDescription(PravegaStreamDescription streamDescription, List<PravegaStreamFieldGroup> event)
+    {
+        this.tableName = streamDescription.tableName;
+        this.schemaName = streamDescription.schemaName;
+        this.objectName = streamDescription.objectName;
+        this.objectType = streamDescription.objectType;
+        this.objectArgs = streamDescription.objectArgs;
+        this.event = Optional.of(event);
+    }
+
     @JsonProperty
     public Optional<String> getSchemaName()
     {

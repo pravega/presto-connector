@@ -26,7 +26,7 @@ import java.util.Optional;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Presto plugin to use Apache Pravega as a data source.
+ * Presto plugin to use Pravega as a data source.
  */
 public class PravegaPlugin
         implements Plugin
