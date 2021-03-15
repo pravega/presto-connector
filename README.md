@@ -30,7 +30,22 @@ Pravega Presto connector has a set of unit tests that can take several minutes t
 
     ./gradlew test
 
-## Running Presto
+## Installing Presto
+
+Instructions for downloading, installing and configuring Presto can be found here: https://prestodb.io/docs/current/installation/deployment.html.
+
+A typical Presto installation installs the Presto server in /usr/lib. You download (via wget) the gzip'd tar file from Maven using the link defined in the PrestoDB deployment section.  Untar the file while in /usr/lib, which will create a presto-server-<RELEASE> directory.  Create a symbolic link to the code as follows
+    
+    # [root@lrmk226 ~]# ln -s /usr/lib/presto-server-<RELEASE> /usr/lib/presto
+    
+Typically, the Presto configuration files are located in /etc/presto, so create this directory, then create another symbolic link in /usr/lib/presto to point to this directory
+
+    [root@lrmk226 ~]# mkdir /etc/presto
+    [root@lrmk226 ~]# ln -s /etc/presto /usr/lib/presto/etc
+    
+Now follow the directions for Configuring Presto found in the PrestoDB documentation.
+
+## Installing and Configuring Pravega Connector
 
 The plugin file that gets created during the build process is: ./build/distributions/pravega-<VERSION>.tar.gz.  This file can be untar'd in the /usr/lib/presto/lib/plugins directory of a running Presto installation. Like all Presto connectors, the Pravega Presto connector uses a properties files to point to the storage provider (e.g. Pravega controller).  Create a properties file similar to below, but replace the # characters with the appropriate IP address of the Pravega Controller and the Pravega Schema Registry server of your configuration.
 
@@ -38,6 +53,12 @@ The plugin file that gets created during the build process is: ./build/distribut
     connector.name=pravega
     pravega.controller=tcp://##.###.###.###:9090
     pravega.schema-registry=http://##.###.###.###:9092
+
+If you have deployed Presto on more than one host (coordinator and one or more workers), you must download/copy the Pravega connector to each node, and create the configuration properties file on all hosts.
+
+## Running Presto Server
+
+As mentioned in the PrestoDB documentation, use the launcher tool to start the Presto server on each node.
 
 ## Running Presto in your IDE
 
@@ -75,5 +96,56 @@ Create the pravega.properties file as previously described.
 
 ## Schema Definitions
 
-Currently, you must manually create schema definitions using a JSON file. In future releases, the 'CREATE TABLE' Presto command will be available.
+Currently, you must manually create schema definitions using a JSON file. In future releases, the 'CREATE TABLE' Presto command will be available.  The JSON configuration files are read at server startup, and should be located in /etc/presto/pravega directory.  An example schema definition file might be:
+
+    {
+        "tableName": "customer",
+        "schemaName": "tpch",
+        "objectName": "customer",
+        "event": [{
+            "dataFormat": "json",
+            "fields": [
+                {
+                    "name": "custkey",
+                    "mapping": "custkey",
+                    "type": "BIGINT"
+                },
+                {
+                    "name": "name",
+                    "mapping": "name",
+                    "type": "VARCHAR(25)"
+                },
+                {
+                    "name": "address",
+                    "mapping": "address",
+                    "type": "VARCHAR(40)"
+                },
+                {
+                    "name": "nationkey",
+                    "mapping": "nationkey",
+                    "type": "BIGINT"
+                },
+                {
+                    "name": "phone",
+                    "mapping": "phone",
+                    "type": "VARCHAR(15)"
+                },
+                {
+                    "name": "acctbal",
+                    "mapping": "acctbal",
+                    "type": "DOUBLE"
+                },
+                {
+                    "name": "mktsegment",
+                    "mapping": "mktsegment",
+                    "type": "VARCHAR(10)"
+                },
+                {
+                    "name": "comment",
+                    "mapping": "comment",
+                    "type": "VARCHAR(117)"
+                }
+            ]
+        }]
+    }
 
