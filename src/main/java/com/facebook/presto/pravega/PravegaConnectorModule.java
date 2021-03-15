@@ -20,6 +20,7 @@ import com.facebook.airlift.configuration.AbstractConfigurationAwareModule;
 import com.facebook.presto.common.type.Type;
 import com.facebook.presto.common.type.TypeManager;
 import com.facebook.presto.decoder.DecoderModule;
+import com.facebook.presto.pravega.decoder.JsonRowDecoderFactory;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer;
 import com.google.inject.Binder;
@@ -47,6 +48,7 @@ public class PravegaConnectorModule
         binder.bind(PravegaRecordSetProvider.class).in(Scopes.SINGLETON);
 
         binder.bind(PravegaSegmentManager.class).in(Scopes.SINGLETON);
+        binder.bind(JsonRowDecoderFactory.class).in(Scopes.SINGLETON);
         configBinder(binder).bindConfig(PravegaConnectorConfig.class);
 
         jsonBinder(binder).addDeserializerBinding(Type.class).to(TypeDeserializer.class);
