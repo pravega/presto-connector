@@ -84,7 +84,7 @@ The working directory should be manually created and set to where the configurat
     537429123    0 drwxr-xr-x   4 root     root           97 Mar  2 17:12 /root/presto/etc
     805328026    0 drwxr-xr-x   2 root     root           32 Mar  3 15:58 /root/presto/etc/catalog
     816318053    4 -rw-r--r--   1 root     root          119 Mar  3 15:58 /root/presto/etc/catalog/pravega.properties
-    272367596    0 drwxr-xr-x   2 root     root            6 Mar  2 17:04 /root/presto/etc/ecs
+    272367596    0 drwxr-xr-x   2 root     root            6 Mar  2 17:04 /root/presto/etc/pravega
     537429402    4 -rw-r--r--   1 root     root          854 Mar  2 17:10 /root/presto/etc/config.properties
     537429389    4 -rw-r--r--   1 root     root          351 Mar  2 17:11 /root/presto/etc/jvm.config
     537435775    4 -rw-r--r--   1 root     root          378 Mar  2 17:12 /root/presto/etc/log.properties
@@ -96,7 +96,7 @@ Create the pravega.properties file as previously described.
 
 ## Schema Definitions
 
-Currently, you must manually create schema definitions using a JSON file. In future releases, the 'CREATE TABLE' Presto command will be available.  The JSON configuration files are read at server startup, and should be located in /etc/presto/pravega directory.  An example schema definition file might be:
+Currently, you must manually create schema definitions using a JSON file. In future releases, the 'CREATE TABLE' Presto command will be available.  The JSON configuration files are read at server startup, and should be located in /etc/presto/pravega directory.  In the JSON schema example below, "customer" is a stream name in the tpch pravega scope.
 
     {
         "tableName": "customer",
