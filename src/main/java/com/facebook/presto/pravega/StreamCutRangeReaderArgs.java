@@ -23,23 +23,20 @@ import java.io.Serializable;
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static java.util.Objects.requireNonNull;
 
-public class ReaderArgs
+public class StreamCutRangeReaderArgs
         implements Serializable
 {
     private final String scope;
     private final String stream;
     private final StreamCutRange streamCutRange;
-    private final String readerGroup;
 
-    public ReaderArgs(@JsonProperty("scope") String scope,
-                      @JsonProperty("stream") String stream,
-                      @JsonProperty("streamCutRange") StreamCutRange streamCutRange,
-                      @JsonProperty("readerGroup") String readerGroup)
+    public StreamCutRangeReaderArgs(@JsonProperty("scope") String scope,
+                                    @JsonProperty("stream") String stream,
+                                    @JsonProperty("streamCutRange") StreamCutRange streamCutRange)
     {
         this.scope = requireNonNull(scope, "scope is null");
         this.stream = requireNonNull(stream, "stream is null");
         this.streamCutRange = requireNonNull(streamCutRange, "streamCutRange is null");
-        this.readerGroup = readerGroup; // may be null
     }
 
     @JsonProperty
@@ -60,12 +57,6 @@ public class ReaderArgs
         return streamCutRange;
     }
 
-    @JsonProperty
-    public String getReaderGroup()
-    {
-        return readerGroup;
-    }
-
     @Override
     public String toString()
     {
@@ -73,7 +64,6 @@ public class ReaderArgs
                 .add("scope", scope)
                 .add("stream", stream)
                 .add("streamCutRange", streamCutRange)
-                .add("readerGroup", readerGroup)
                 .toString();
     }
 }

@@ -24,13 +24,9 @@ import java.util.List;
 
 public class PravegaProperties
 {
-    private static final String SESSION_READER_TYPE = "reader_type";
-
     private static final String SESSION_CURSOR_DELIM_CHAR = "cursor_delim_char";
 
-    private static final String SESSION_GROUPED_EVENT_SPLITS = "grouped_event_splits";
-
-    private static final String SESSION_EVENT_READ_TIMEOUT_MS = "event_read_timeout_ms";
+    private static final String SEGMENT_RANGE_SPLIT_SIZE_BYTES = "segment_range_split_size_bytes";
 
     private final ConnectorSession session;
 
@@ -47,28 +43,14 @@ public class PravegaProperties
                 PropertyMetadata.stringProperty(
                         SESSION_CURSOR_DELIM_CHAR,
                         "character used as field separator for delimited formats",
-                        ",",
-                        false));
-
-        propertyMetadataList.add(
-                PropertyMetadata.stringProperty(
-                        SESSION_READER_TYPE,
-                        "reader type [event|grouped_event|segment_range|segment_range_per_split]",
-                        "segment_range_per_split",
+                        "|",
                         false));
 
         propertyMetadataList.add(
                 PropertyMetadata.integerProperty(
-                        SESSION_GROUPED_EVENT_SPLITS,
-                        "number of splits when using grouped readers",
-                        63,
-                        false));
-
-        propertyMetadataList.add(
-                PropertyMetadata.integerProperty(
-                        SESSION_EVENT_READ_TIMEOUT_MS,
-                        "timeout in ms to readNextEvent()",
-                        10000,
+                        SEGMENT_RANGE_SPLIT_SIZE_BYTES,
+                        "desired split size for segment range. cannot guarantee the size, it is approximate",
+                        32 * 1048576,
                         false));
 
         return propertyMetadataList;
@@ -79,18 +61,8 @@ public class PravegaProperties
         return session.getProperty(SESSION_CURSOR_DELIM_CHAR, String.class);
     }
 
-    public String getReaderType()
+    public int getSegmentRangeSplitSizeBytes()
     {
-        return session.getProperty(SESSION_READER_TYPE, String.class);
-    }
-
-    public int getGroupedEventSplits()
-    {
-        return session.getProperty(SESSION_GROUPED_EVENT_SPLITS, Integer.class);
-    }
-
-    public int getEventReadTimeoutMs()
-    {
-        return session.getProperty(SESSION_EVENT_READ_TIMEOUT_MS, Integer.class);
+        return session.getProperty(SEGMENT_RANGE_SPLIT_SIZE_BYTES, Integer.class);
     }
 }

@@ -76,7 +76,7 @@ public class PravegaSegmentManager
         registryClient = SchemaRegistryClientFactory.withDefaultNamespace(registryConfig);
     }
 
-    private BatchClientFactory batchClientFactory(String scope)
+    BatchClientFactory batchClientFactory(String scope)
     {
         BatchClientFactory batchClientFactory = clientFactoryMap.get(scope);
         if (batchClientFactory == null) {
@@ -91,6 +91,11 @@ public class PravegaSegmentManager
             }
         }
         return batchClientFactory;
+    }
+
+    public StreamManager getStreamManager()
+    {
+        return StreamManager.create(clientConfig.getControllerURI());
     }
 
     /**

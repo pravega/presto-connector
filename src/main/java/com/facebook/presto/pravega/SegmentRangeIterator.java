@@ -31,75 +31,26 @@ public class SegmentRangeIterator
 {
     private static final Logger log = Logger.get(SegmentRangeIterator.class);
 
-    private final PravegaSegmentManager segmentManager;
+    private final SegmentIterator<ByteBuffer> segmentEventIterator;
 
-    private final Iterator<SegmentRange> segmentIterator;
+    private SegmentRange segmentRange;
 
-    private SegmentIterator<ByteBuffer> segmentEventIterator;
-
-    private ByteBuffer event;
-
-    private final StreamCutRange streamCutRange;
-
-    private int fullSegments;
-
-    private int emptySegments;
-
-    private int events;
-
-    public SegmentRangeIterator(PravegaSegmentManager segmentManager, ReaderArgs readerArgs)
+    public SegmentRangeIterator(PravegaSegmentManager segmentManager, SegmentRange segmentRange)
     {
-        this.segmentManager = segmentManager;
-
-        this.streamCutRange = readerArgs.getStreamCutRange();
-
-        log.info("open iterator for " + streamCutRange);
-        this.segmentIterator =
-                segmentManager.getSegments(readerArgs.getScope(),
-                        readerArgs.getStream(),
-                        readerArgs.getStreamCutRange().getStart(),
-                        readerArgs.getStreamCutRange().getEnd()).getIterator();
-    }
-
-    private ByteBuffer _next()
-    {
-        if (segmentEventIterator != null && segmentEventIterator.hasNext()) {
-            events++;
-            return segmentEventIterator.next();
-        }
-
-        do {
-            if (!segmentIterator.hasNext()) {
-                log.info("done with " + streamCutRange + "; full: " + fullSegments + ", empty: " + emptySegments + ", events: " + events);
-                return null;
-            }
-
-            segmentEventIterator = segmentManager.getSegmentIterator(segmentIterator.next(), new ByteBufferSerializer());
-            log.info("next segment " + streamCutRange + " has event? " + segmentEventIterator.hasNext());
-            if (segmentEventIterator.hasNext()) {
-                fullSegments++;
-                events++;
-                return segmentEventIterator.next();
-            }
-            emptySegments++;
-            // maybe segment was empty, continue
-        } while (true);
+        log.info("open iterator for " + segmentRange);
+        this.segmentEventIterator = segmentManager.getSegmentIterator(segmentRange, new ByteBufferSerializer());
+        this.segmentRange = segmentRange;
     }
 
     @Override
     public boolean hasNext()
     {
-        if (event == null) {
-            event = _next();
-        }
-        return event != null;
+        return segmentEventIterator.hasNext();
     }
 
     @Override
     public DecodableEvent next()
     {
-        ByteBuffer toReturn = event;
-        event = null;
-        return new BytesEvent(toReturn);
+        return new BytesEvent(segmentEventIterator.next());
     }
 }
