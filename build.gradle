@@ -61,6 +61,7 @@ dependencies {
 
     testImplementation "com.facebook.presto:presto-tests:${prestoVersion}"
     testImplementation "com.facebook.airlift:testing:${airliftTestingVersion}"
+    testImplementation "com.starburstdata:starburst-spotify-docker-client:${spotifyDockerClientVersion}"
 
     compileOnly "io.airlift:slice:${airliftSliceVersion}"
     compileOnly "io.airlift:units:${airliftUnitsVersion}"
