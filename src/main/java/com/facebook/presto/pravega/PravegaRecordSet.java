@@ -23,6 +23,7 @@ import com.facebook.presto.pravega.decoder.DecodableEvent;
 import com.facebook.presto.pravega.decoder.EventDecoder;
 import com.facebook.presto.spi.RecordCursor;
 import com.facebook.presto.spi.RecordSet;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import io.pravega.client.batch.SegmentRange;
 
