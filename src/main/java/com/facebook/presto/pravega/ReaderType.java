@@ -18,9 +18,7 @@ package com.facebook.presto.pravega;
 
 public enum ReaderType
 {
-    SEGMENT_RANGE             /* 1 split handles all segments within a stream cut */,
-    SEGMENT_RANGE_PER_SPLIT   /* segments for stream cut are given out to different splits */,
-    EVENT_STREAM              /* stream oriented reading (vs. segments) */,
-    SINGLE_GROUP_EVENT_STREAM /* stream oriented reading (vs. segments) all readers in same group */,
+    STREAM_CUT_RANGE          /* split will handle all segment ranges within a particular stream cut */,
+    SEGMENT_RANGE_PER_SPLIT   /* split will handle a single segment range */,
     KVT                       /* key value table */,
 }

@@ -29,6 +29,7 @@ dependencies {
     compile "com.facebook.airlift:bootstrap:${airliftBootstrapVersion}"
     compile "com.facebook.airlift:json:${airliftJsonVersion}"
     compile "com.facebook.airlift:log:${airliftLogVersion}"
+    compile "com.facebook.airlift:concurrent:${airliftConcurrentVersion}"
     compile "com.facebook.airlift:configuration:${airliftConfigurationVersion}"
     compile "com.google.guava:guava:${guavaVersion}"
     compile "com.google.inject:guice:${guiceVersion}"

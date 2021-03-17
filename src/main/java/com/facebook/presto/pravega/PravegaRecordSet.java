@@ -23,6 +23,7 @@ import com.facebook.presto.pravega.decoder.DecodableEvent;
 import com.facebook.presto.pravega.decoder.EventDecoder;
 import com.facebook.presto.spi.RecordCursor;
 import com.facebook.presto.spi.RecordSet;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import io.pravega.client.batch.SegmentRange;
 
@@ -81,26 +82,9 @@ public class PravegaRecordSet
     @Override
     public RecordCursor cursor()
     {
-        Iterator<DecodableEvent> eventIterator;
-
-        switch (split.getReaderType()) {
-            case EVENT_STREAM:
-            case SINGLE_GROUP_EVENT_STREAM:
-                eventIterator = new EventStreamIterator(segmentManager, deserialize(split.getReaderArgs(), ReaderArgs.class), properties);
-                break;
-
-            case SEGMENT_RANGE:
-                eventIterator = new SegmentRangeIterator(segmentManager, deserialize(split.getReaderArgs(), ReaderArgs.class));
-                break;
-
-            case SEGMENT_RANGE_PER_SPLIT:
-                eventIterator = new SegmentEventIterator(segmentManager, deserialize(split.getReaderArgs(), SegmentRange.class));
-                break;
-
-            default:
-                throw new IllegalArgumentException("readerType " + split.getReaderType());
-        }
-
+        Preconditions.checkArgument(split.getReaderType() == ReaderType.SEGMENT_RANGE_PER_SPLIT);
+        Iterator<DecodableEvent> eventIterator =
+                new SegmentRangeIterator(segmentManager, deserialize(split.getReaderArgs(), SegmentRange.class));
         return new PravegaRecordCursor(eventIterator, columnHandles, eventDecoder, properties, split.getSchema().get(0).getFormat());
     }
 }
