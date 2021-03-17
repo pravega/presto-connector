@@ -12,8 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Note: This file contains changes from PrestoDb.  Specifically the decodeTree and locateNode methods.
+ * https://github.com/prestodb/presto/blob/0.235/presto-record-decoder/src/main/java/com/facebook/presto/decoder/json/JsonRowDecoder.java
  */
-
 package com.facebook.presto.pravega.decoder;
 
 import com.facebook.presto.decoder.DecoderColumnHandle;
