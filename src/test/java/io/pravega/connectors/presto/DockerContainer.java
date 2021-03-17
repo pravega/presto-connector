@@ -10,6 +10,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Note: This class file is from PrestoDb (with minor change to set "cmd" in ContainerConfig.Builder)
+ * https://github.com/prestodb/presto/blob/0.247/presto-testing-docker/src/main/java/com/facebook/presto/testing/docker/DockerContainer.java
  */
 package io.pravega.connectors.presto;
 
