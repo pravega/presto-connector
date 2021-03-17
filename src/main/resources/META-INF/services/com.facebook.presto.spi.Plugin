@@ -1,1 +1,1 @@
-com.facebook.presto.pravega.PravegaPlugin
+io.pravega.connectors.presto.PravegaPlugin
