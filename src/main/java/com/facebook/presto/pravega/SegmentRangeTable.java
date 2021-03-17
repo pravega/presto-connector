@@ -114,7 +114,7 @@ public class SegmentRangeTable
                     // insert first position by looking up starting offset for the segment
                     segment = lookup.computeIfAbsent(swr.getSegmentId(),
                             k -> new Segment(stream.getScope(), stream.getStreamName(), swr.getSegmentId()));
-                    baseline.put(segment.getSegmentId(), batchClient.firstStreamCut(segment));
+                    baseline.put(segment.getSegmentId(), firstStreamCut(segment));
                 }
                 else if (distance(segment, baseline.get(segment.getSegmentId()), offset) >= desiredSegmentRangeSizeBytes) {
                     // size exceeded, this is a split
@@ -140,14 +140,21 @@ public class SegmentRangeTable
         });
     }
 
+    private StreamCut firstStreamCut(Segment segment)
+    {
+        return new StreamCutImpl(segment.getStream(), segment, batchClient.currentSegmentRange(segment).getStartOffset());
+    }
+
     private SegmentRange constructRange(Segment segment, StreamCut start, StreamCut end)
     {
-        if (start == null) {
-            start = batchClient.firstStreamCut(segment);
-        }
-
-        if (end == null) {
-            end = batchClient.lastStreamCut(segment);
+        if (start == null || end == null) {
+            SegmentRange range = batchClient.currentSegmentRange(segment);
+            if (start == null) {
+                start = new StreamCutImpl(segment.getStream(), segment, range.getStartOffset());
+            }
+            if (end == null) {
+                end = new StreamCutImpl(segment.getStream(), segment, range.getEndOffset());
+            }
         }
 
         return SegmentRangeImpl.fromStreamCuts(segment, start, end);
