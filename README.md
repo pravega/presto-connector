@@ -18,43 +18,50 @@ To build and run the Pravega Presto connector, you must meet the following requi
 * Pravega version 0.9.0 or higher
 * Pravega Schema Registry version 0.2.0 or higher
 
-## Building Presto
+## Building Pravega Presto connector
 
 Pravega Presto connector is a standard Gradle project. Simply run the following command from the project root directory:
 
-    ./gradlew clean build
+    # [root@lrmk226 ~]# ./gradlew clean build
 
 On the first build, Gradle will download all the dependencies from various locations of the internet and cache them in the local repository (`~/.gradle / caches `), which can take a considerable amount of time.  Subsequent builds will be faster.  
 
 Pravega Presto connector has a set of unit tests that can take several minutes to run. You can run the tests using this command:
 
-    ./gradlew test
+    # [root@lrmk226 ~]# ./gradlew test
 
 ## Installing Presto
 
-Instructions for downloading, installing and configuring Presto can be found here: https://prestodb.io/docs/current/installation/deployment.html.
+If you haven't already done so, install the Presto server and default connectors on one or more Linux hosts. Instructions for downloading, installing and configuring Presto can be found here: https://prestodb.io/docs/current/installation/deployment.html.
 
-A typical Presto installation installs the Presto server in /usr/lib. You download (via wget) the gzip'd tar file from Maven using the link defined in the PrestoDB deployment section.  Untar the file while in /usr/lib, which will create a presto-server-<RELEASE> directory.  Create a symbolic link to the code as follows
+When using the tar.gz Presto bundle downloaded from Maven Central, the Presto installation can be installed in any location. Determine a location with sufficient available storage space. Using the wget command, download the gzip'd tar file from Maven using the link defined in the PrestoDB deployment section, but similar to the steps below:
     
-    # [root@lrmk226 ~]# ln -s /usr/lib/presto-server-<RELEASE> /usr/lib/presto
+    # [root@lrmk226 ~]# pwd
+    /root
+    # [root@lrmk226 ~]# wget https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.248/presto-server-0.248.tar.gz
+    # [root@lrmk226 ~]# tar xvzf presto-server-0.248.tar.gz
+    # [root@lrmk226 ~]# export PRESTO_HOME=/root/presto-server-0.248
     
-Typically, the Presto configuration files are located in /etc/presto, so create this directory, then create another symbolic link in /usr/lib/presto to point to this directory
+Make a directory for the Presto configuration files
 
-    [root@lrmk226 ~]# mkdir /etc/presto
-    [root@lrmk226 ~]# ln -s /etc/presto /usr/lib/presto/etc
+    [root@lrmk226 ~]# mkdir $PRESTO_HOME/etc
     
-Now follow the directions for Configuring Presto found in the PrestoDB documentation.
+Now follow the directions to create the neccesary configuration files for configuring Presto found in the PrestoDB documentation.
 
 ## Installing and Configuring Pravega Connector
 
-The plugin file that gets created during the build process is: ./build/distributions/pravega-<VERSION>.tar.gz.  This file can be untar'd in the /usr/lib/presto/lib/plugins directory of a running Presto installation. Like all Presto connectors, the Pravega Presto connector uses a properties files to point to the storage provider (e.g. Pravega controller).  Create a properties file similar to below, but replace the # characters with the appropriate IP address of the Pravega Controller and the Pravega Schema Registry server of your configuration.
+The plugin file that gets created during the presto-connector build process is: ./build/distributions/pravega-<VERSION>.tar.gz.  This file can be untar'd in the $PRESTO_ROOT/plugin directory of a valid Presto installation. Like all Presto connectors, the Pravega Presto connector uses a properties files to point to the storage provider (e.g. Pravega controller).  Create a properties file similar to below, but replace the # characters with the appropriate IP address of the Pravega Controller and the Pravega Schema Registry server of your configuration.
 
-    [root@lrmk226 ~]# cat /etc/presto/catalog/pravega.properties
+    [root@lrmk226 ~]# cd $PRESTO_HOME/plugin
+    [root@lrmk226 ~]# ls *.gz
+    pravega-presto-connector-0.1.0.tar.gz
+    [root@lrmk226 ~]# tar xvfz pravega-presto-connector-0.1.0.tar.gz
+    [root@lrmk226 ~]# cat $PRESTO_HOME/catalog/pravega.properties
     connector.name=pravega
     pravega.controller=tcp://##.###.###.###:9090
     pravega.schema-registry=http://##.###.###.###:9092
 
-If you have deployed Presto on more than one host (coordinator and one or more workers), you must download/copy the Pravega connector to each node, and create the configuration properties file on all hosts.
+If you have deployed Presto on more than one host (coordinator and one or more workers), you must download/copy the Pravega connector gzip tar file to each node, and create the configuration properties file on all hosts.
 
 ## Running Presto Server
 
@@ -88,11 +95,11 @@ The working directory should be manually created and set to where the configurat
     537429402    4 -rw-r--r--   1 root     root          854 Mar  2 17:10 /root/presto/etc/config.properties
     537429389    4 -rw-r--r--   1 root     root          351 Mar  2 17:11 /root/presto/etc/jvm.config
     537435775    4 -rw-r--r--   1 root     root          378 Mar  2 17:12 /root/presto/etc/log.properties
-    575879    0 drwxr-xr-x   3 root     root           17 Mar  2 17:17 /root/presto/var
+    575879       0 drwxr-xr-x   3 root     root           17 Mar  2 17:17 /root/presto/var
     268833640    0 drwxr-xr-x   2 root     root           30 Mar 10 10:42 /root/presto/var/log
     272373839   12 -rw-r--r--   1 root     root        11230 Mar 10 10:42 /root/presto/var/log/http-request.log
 
-Create the pravega.properties file as previously described.
+Create the pravega.properties file in /root/presto/etc/catalog as previously described.
 
 ## Schema Definitions
 
