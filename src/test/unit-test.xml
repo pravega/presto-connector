@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="unit">
+    <test name="unit-test">
+        <packages>
+            <package name="io.pravega.connectors.presto"/>
+        </packages>
+    </test>
+</suite>

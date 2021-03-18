@@ -16,7 +16,7 @@
  * Note: This file contains some code from PrestoDb (majority of the "ResultsSession" implementation)
  * https://github.com/prestodb/presto/blob/0.247/presto-kafka/src/test/java/com/facebook/presto/kafka/util/KafkaLoader.java
  */
-package io.pravega.connectors.presto;
+package io.pravega.connectors.presto.integration;
 
 import com.facebook.presto.Session;
 import com.facebook.presto.client.Column;

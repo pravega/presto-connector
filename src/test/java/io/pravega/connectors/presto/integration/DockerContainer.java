@@ -14,7 +14,7 @@
  * Note: This class file is from PrestoDb (with minor change to set "cmd" in ContainerConfig.Builder)
  * https://github.com/prestodb/presto/blob/0.247/presto-testing-docker/src/main/java/com/facebook/presto/testing/docker/DockerContainer.java
  */
-package io.pravega.connectors.presto;
+package io.pravega.connectors.presto.integration;
 
 import com.facebook.airlift.log.Logger;
 import com.google.common.collect.ImmutableList;

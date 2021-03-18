@@ -97,6 +97,14 @@ distributions {
     }
 }
 
+def integration = project.hasProperty("integration")
+
 test {
-    useTestNG()
+    dependsOn 'cleanTest'
+    useTestNG() {
+        suites "src/test/unit-test.xml"
+        if (integration) {
+            suites "src/test/integration-test.xml"
+        }
+    }
 }

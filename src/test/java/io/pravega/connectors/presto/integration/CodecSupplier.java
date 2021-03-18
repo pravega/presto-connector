@@ -14,7 +14,7 @@
  * Note: This class file is from PrestoDb
  * https://github.com/prestodb/presto/blob/0.247/presto-kafka/src/test/java/com/facebook/presto/kafka/util/CodecSupplier.java
  */
-package io.pravega.connectors.presto;
+package io.pravega.connectors.presto.integration;
 
 import com.facebook.airlift.json.JsonCodec;
 import com.facebook.airlift.json.JsonCodecFactory;

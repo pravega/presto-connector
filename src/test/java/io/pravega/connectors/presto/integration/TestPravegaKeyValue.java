@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.pravega.connectors.presto;
+package io.pravega.connectors.presto.integration;
 
 import com.facebook.presto.Session;
 import com.facebook.presto.testing.MaterializedResult;
 import com.facebook.presto.tests.DistributedQueryRunner;
+import io.pravega.connectors.presto.PravegaStreamDescription;
+import io.pravega.connectors.presto.PravegaStreamFieldDescription;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import java.util.List;
 
 import static com.facebook.presto.testing.TestingSession.testSessionBuilder;
-import static io.pravega.connectors.presto.PravegaTestUtils.getKvStreamDesc;
+import static io.pravega.connectors.presto.integration.PravegaTestUtils.getKvStreamDesc;
 import static org.testng.Assert.assertEquals;
 
 @Test

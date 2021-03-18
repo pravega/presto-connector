@@ -115,9 +115,9 @@ public class PravegaTableDescriptionSupplier
     }
 
     @VisibleForTesting
-    PravegaTableDescriptionSupplier(PravegaConnectorConfig pravegaConnectorConfig,
-                                    Cache<String, Object> schemaCache,
-                                    Cache<PravegaTableName, Optional<PravegaStreamDescription>> tableCache)
+    public PravegaTableDescriptionSupplier(PravegaConnectorConfig pravegaConnectorConfig,
+                                           Cache<String, Object> schemaCache,
+                                           Cache<PravegaTableName, Optional<PravegaStreamDescription>> tableCache)
     {
         this.pravegaConnectorConfig = pravegaConnectorConfig;
         this.schemaCache = schemaCache;

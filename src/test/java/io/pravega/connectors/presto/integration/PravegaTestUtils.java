@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.pravega.connectors.presto;
+package io.pravega.connectors.presto.integration;
 
 import com.facebook.airlift.json.JsonCodec;
 import com.facebook.presto.common.QualifiedObjectName;
@@ -21,6 +21,9 @@ import com.facebook.presto.tests.TestingPrestoClient;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import io.pravega.client.admin.StreamManager;
+import io.pravega.connectors.presto.PravegaStreamDescription;
+import io.pravega.connectors.presto.PravegaStreamFieldDescription;
+import io.pravega.connectors.presto.PravegaStreamFieldGroup;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecordBuilder;
 

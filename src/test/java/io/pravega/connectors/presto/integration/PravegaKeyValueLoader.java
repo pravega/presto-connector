@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.pravega.connectors.presto;
+package io.pravega.connectors.presto.integration;
 
 import io.pravega.client.ClientConfig;
 import io.pravega.client.KeyValueTableFactory;

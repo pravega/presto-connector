@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.pravega.connectors.presto;
+package io.pravega.connectors.presto.integration;
 
 import com.facebook.airlift.json.JsonCodec;
 import com.facebook.airlift.log.Logger;
@@ -31,6 +31,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import io.airlift.tpch.TpchTable;
 import io.pravega.client.admin.StreamManager;
+import io.pravega.connectors.presto.PravegaPlugin;
+import io.pravega.connectors.presto.PravegaStreamDescription;
+import io.pravega.connectors.presto.PravegaTableDescriptionSupplier;
+import io.pravega.connectors.presto.PravegaTableName;
 
 import java.net.URI;
 import java.util.Map;
@@ -40,8 +44,8 @@ import static com.facebook.airlift.testing.Closeables.closeAllSuppress;
 import static com.facebook.presto.testing.TestingSession.testSessionBuilder;
 import static com.facebook.presto.tpch.TpchMetadata.TINY_SCHEMA_NAME;
 import static io.airlift.units.Duration.nanosSince;
-import static io.pravega.connectors.presto.PravegaTestUtils.getKvStreamDesc;
-import static io.pravega.connectors.presto.PravegaTestUtils.getStreamDesc;
+import static io.pravega.connectors.presto.integration.PravegaTestUtils.getKvStreamDesc;
+import static io.pravega.connectors.presto.integration.PravegaTestUtils.getStreamDesc;
 import static java.util.Locale.ENGLISH;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
