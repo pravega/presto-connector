@@ -56,7 +56,7 @@ The plugin file that gets created during the presto-connector build process is: 
     [root@lrmk226 ~]# ls *.gz
     pravega-presto-connector-0.1.0.tar.gz
     [root@lrmk226 ~]# tar xvfz pravega-presto-connector-0.1.0.tar.gz
-    [root@lrmk226 ~]# cat $PRESTO_HOME/catalog/pravega.properties
+    [root@lrmk226 ~]# cat $PRESTO_HOME/etc/catalog/pravega.properties
     connector.name=pravega
     pravega.controller=tcp://##.###.###.###:9090
     pravega.schema-registry=http://##.###.###.###:9092
