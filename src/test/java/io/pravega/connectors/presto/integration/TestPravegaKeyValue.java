@@ -29,7 +29,6 @@ import static com.facebook.presto.testing.TestingSession.testSessionBuilder;
 import static io.pravega.connectors.presto.integration.PravegaTestUtils.getKvStreamDesc;
 import static org.testng.Assert.assertEquals;
 
-@Test
 public class TestPravegaKeyValue
 {
     private final EmbeddedPravega pravega;

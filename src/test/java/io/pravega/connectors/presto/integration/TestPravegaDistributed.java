@@ -27,6 +27,7 @@ public class TestPravegaDistributed
     private final EmbeddedPravega pravega;
 
     public TestPravegaDistributed()
+            throws Exception
     {
         this(new EmbeddedPravega());
     }
