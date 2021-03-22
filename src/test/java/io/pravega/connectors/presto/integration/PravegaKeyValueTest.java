@@ -29,13 +29,14 @@ import static com.facebook.presto.testing.TestingSession.testSessionBuilder;
 import static io.pravega.connectors.presto.integration.PravegaTestUtils.getKvStreamDesc;
 import static org.testng.Assert.assertEquals;
 
-public class TestPravegaKeyValue
+@Test
+public class PravegaKeyValueTest
 {
     private final EmbeddedPravega pravega;
 
     private final DistributedQueryRunner queryRunner;
 
-    public TestPravegaKeyValue()
+    public PravegaKeyValueTest()
             throws Exception
     {
         this.pravega = new EmbeddedPravega();

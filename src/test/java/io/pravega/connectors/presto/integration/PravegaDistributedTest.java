@@ -21,18 +21,18 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 @Test
-public class TestPravegaDistributed
+public class PravegaDistributedTest
         extends AbstractTestQueries
 {
     private final EmbeddedPravega pravega;
 
-    public TestPravegaDistributed()
+    public PravegaDistributedTest()
             throws Exception
     {
         this(new EmbeddedPravega());
     }
 
-    public TestPravegaDistributed(EmbeddedPravega pravega)
+    public PravegaDistributedTest(EmbeddedPravega pravega)
     {
         super(() -> PravegaQueryRunner.createQueryRunner(pravega.getController(), TpchTable.getTables(), java.util.Collections.emptyList()));
         this.pravega = pravega;
