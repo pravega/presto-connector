@@ -40,7 +40,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 @Test
-public class TestJsonRowDecoder
+public class JsonRowDecoderTest
 {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -89,7 +89,7 @@ public class TestJsonRowDecoder
         JsonRowDecoder decoder = decoderFactory.create(columns.stream().collect(toImmutableSet()));
 
         TypedRecordValue recordValue = new TypedRecordValue(columns.stream()
-                .map(TestJsonRowDecoder::columnHandle)
+                .map(JsonRowDecoderTest::columnHandle)
                 .collect(Collectors.toList()));
 
         assertTrue(decoder.decodeEvent(new JsonEvent(toJson(mapping, type, value)), recordValue));
