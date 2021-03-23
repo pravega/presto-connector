@@ -16,6 +16,7 @@
 
 package io.pravega.connectors.presto.util;
 
+import io.pravega.client.stream.Stream;
 import io.pravega.connectors.presto.ObjectType;
 import io.pravega.connectors.presto.PravegaStreamDescription;
 import io.pravega.connectors.presto.PravegaTableHandle;
@@ -64,7 +65,7 @@ public class PravegaNameUtils
                 multiSourceStream(object.getObjectName());
     }
 
-    private static boolean multiSourceStream(String stream)
+    public static boolean multiSourceStream(String stream)
     {
         try {
             // test pattern for stream names pravega will allow
@@ -107,5 +108,16 @@ public class PravegaNameUtils
     public static String streamCutName(String stream)
     {
         return stream + STREAM_CUT_PREFIX;
+    }
+
+    public static boolean internalStream(Stream stream)
+    {
+        return internalObject(stream.getStreamName());
+    }
+
+    public static boolean internalObject(String object)
+    {
+        return object.startsWith("_") /* pravega internal */ ||
+                object.endsWith("-SC") /* application internal - stream cuts */;
     }
 }

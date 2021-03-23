@@ -35,11 +35,6 @@ public final class PravegaTableHandle
         implements ConnectorTableHandle
 {
     /**
-     * connector id
-     */
-    private final String connectorId;
-
-    /**
      * The schema name for this table. Is set through configuration and read
      */
     private final String schemaName;
@@ -64,7 +59,6 @@ public final class PravegaTableHandle
 
     @JsonCreator
     public PravegaTableHandle(
-            @JsonProperty("connectorId") String connectorId,
             @JsonProperty("schemaName") String schemaName,
             @JsonProperty("tableName") String tableName,
             @JsonProperty("objectName") String objectName,
@@ -73,7 +67,6 @@ public final class PravegaTableHandle
             @JsonProperty("schema") List<PravegaObjectSchema> schema,
             @JsonProperty("schemaRegistryGroupId") String schemaRegistryGroupId)
     {
-        this.connectorId = requireNonNull(connectorId, "connectorId is null");
         this.schemaName = requireNonNull(schemaName, "schemaName is null");
         this.tableName = requireNonNull(tableName, "tableName is null");
         this.objectName = requireNonNull(objectName, "objectName is null");
@@ -83,10 +76,20 @@ public final class PravegaTableHandle
         this.schemaRegistryGroupId = requireNonNull(schemaRegistryGroupId, "schemaRegistryGroupId is null");
     }
 
-    @JsonProperty
-    public String getConnectorId()
+    public PravegaTableHandle(
+            @JsonProperty("schemaName") String schemaName,
+            @JsonProperty("tableName") String tableName,
+            @JsonProperty("objectName") String objectName,
+            @JsonProperty("objectType") ObjectType objectType,
+            @JsonProperty("objectArgs") Optional<List<String>> objectArgs)
     {
-        return connectorId;
+        this.schemaName = requireNonNull(schemaName, "schemaName is null");
+        this.tableName = requireNonNull(tableName, "tableName is null");
+        this.objectName = requireNonNull(objectName, "objectName is null");
+        this.objectType = requireNonNull(objectType, "objectType is null");
+        this.objectArgs = objectArgs;
+        this.schema = null;
+        this.schemaRegistryGroupId = null;
     }
 
     @JsonProperty
@@ -139,7 +142,7 @@ public final class PravegaTableHandle
     @Override
     public int hashCode()
     {
-        return Objects.hash(connectorId, schemaName, tableName, objectName, objectType, schema);
+        return Objects.hash(schemaName, tableName, objectName, objectType, schema);
     }
 
     @Override
@@ -153,8 +156,7 @@ public final class PravegaTableHandle
         }
 
         PravegaTableHandle other = (PravegaTableHandle) obj;
-        return Objects.equals(this.connectorId, other.connectorId)
-                && Objects.equals(this.schemaName, other.schemaName)
+        return Objects.equals(this.schemaName, other.schemaName)
                 && Objects.equals(this.tableName, other.tableName)
                 && Objects.equals(this.objectName, other.objectName)
                 && Objects.equals(this.objectType, other.objectType)
@@ -165,7 +167,6 @@ public final class PravegaTableHandle
     public String toString()
     {
         return toStringHelper(this)
-                .add("connectorId", connectorId)
                 .add("schemaName", schemaName)
                 .add("tableName", tableName)
                 .add("objectName", objectName)

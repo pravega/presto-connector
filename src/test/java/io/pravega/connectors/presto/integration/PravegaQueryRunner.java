@@ -144,7 +144,7 @@ public final class PravegaQueryRunner
         }
 
         // all schemas + tables will be served from these provided caches
-        return new PravegaTableDescriptionSupplier(null, schemaCache, tableCache);
+        return new PravegaTableDescriptionSupplier(schemaCache, tableCache);
     }
 
     public static Session createSession()

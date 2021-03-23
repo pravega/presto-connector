@@ -18,6 +18,7 @@ package io.pravega.connectors.presto.util;
 import com.facebook.presto.common.type.Type;
 import com.google.protobuf.Descriptors;
 import io.pravega.connectors.presto.PravegaStreamFieldDescription;
+import io.pravega.connectors.presto.PravegaStreamFieldGroup;
 import io.pravega.connectors.presto.ProtobufCommon;
 import io.pravega.schemaregistry.contract.data.SchemaWithVersion;
 import io.pravega.schemaregistry.contract.data.SerializationFormat;
@@ -32,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import static com.facebook.presto.common.type.BigintType.BIGINT;
 import static com.facebook.presto.common.type.BooleanType.BOOLEAN;
@@ -40,6 +42,7 @@ import static com.facebook.presto.common.type.VarbinaryType.VARBINARY;
 import static com.facebook.presto.common.type.VarcharType.createUnboundedVarcharType;
 import static io.pravega.connectors.presto.util.PravegaSchemaUtils.AVRO;
 import static io.pravega.connectors.presto.util.PravegaSchemaUtils.NESTED_RECORD_SEPARATOR;
+import static io.pravega.connectors.presto.util.PravegaSchemaUtils.readSchema;
 import static org.apache.avro.Schema.Type.RECORD;
 
 /**
@@ -342,5 +345,38 @@ public class PravegaStreamDescUtils
         return prefix == null || prefix.isEmpty()
                 ? name
                 : prefix + NESTED_RECORD_SEPARATOR + name;
+    }
+
+    /**
+     * PravegaStreamFieldGroup may contain pointer to schema (local file, or url)
+     * for these, read the schema and build the field definitions
+     *
+     * @param fieldGroups fieldGroups to look through
+     * @param columnPrefix function to return columnPrefix to be used for the fields in the group
+     * @return list of PravegaStreamFieldGroup with all schemas resolved
+     */
+    public static List<PravegaStreamFieldGroup> resolveAllSchemas(List<PravegaStreamFieldGroup> fieldGroups,
+                                                                  Function<Integer, String> columnPrefix)
+    {
+        // fields already defined
+        if (fieldGroups.stream().noneMatch(
+                schema -> schema.getDataSchema().isPresent())) {
+            return fieldGroups;
+        }
+
+        // at least 1 schema for a fieldGroup must be resolved.  read schema from local file or url
+        List<PravegaStreamFieldGroup> finalSchemas = new ArrayList<>(fieldGroups.size());
+        for (int i = 0; i < fieldGroups.size(); i++) {
+            PravegaStreamFieldGroup fieldGroup = fieldGroups.get(i);
+            if (fieldGroup.getDataSchema().isPresent()) {
+                String dataSchema = readSchema(fieldGroup.getDataSchema().get());
+                List<PravegaStreamFieldDescription> fields =
+                        mapFieldsFromSchema(columnPrefix.apply(i), fieldGroup.getDataFormat(), dataSchema);
+                finalSchemas.add(new PravegaStreamFieldGroup(fieldGroup, dataSchema, fields));
+            } else {
+                finalSchemas.add(fieldGroup);
+            }
+        }
+        return finalSchemas;
     }
 }
