@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer;
 import com.google.inject.Binder;
 import com.google.inject.Scopes;
+import io.pravega.connectors.presto.decoder.JsonRowDecoderFactory;
 
 import javax.inject.Inject;
 
@@ -47,6 +48,7 @@ public class PravegaConnectorModule
         binder.bind(PravegaRecordSetProvider.class).in(Scopes.SINGLETON);
 
         binder.bind(PravegaSegmentManager.class).in(Scopes.SINGLETON);
+        binder.bind(JsonRowDecoderFactory.class).in(Scopes.SINGLETON);
         configBinder(binder).bindConfig(PravegaConnectorConfig.class);
 
         jsonBinder(binder).addDeserializerBinding(Type.class).to(TypeDeserializer.class);

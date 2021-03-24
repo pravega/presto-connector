@@ -18,15 +18,13 @@ package io.pravega.connectors.presto;
 
 import com.facebook.airlift.log.Logger;
 import com.facebook.presto.decoder.DecoderColumnHandle;
-import com.facebook.presto.decoder.DispatchingRowDecoderFactory;
-import com.facebook.presto.decoder.RowDecoder;
 import io.pravega.connectors.presto.decoder.AvroRowDecoder;
 import io.pravega.connectors.presto.decoder.AvroSerializer;
 import io.pravega.connectors.presto.decoder.BytesEventDecoder;
 import io.pravega.connectors.presto.decoder.CsvRowDecoder;
 import io.pravega.connectors.presto.decoder.CsvSerializer;
 import io.pravega.connectors.presto.decoder.EventDecoder;
-import io.pravega.connectors.presto.decoder.JsonRowDecoder;
+import io.pravega.connectors.presto.decoder.JsonRowDecoderFactory;
 import io.pravega.connectors.presto.decoder.JsonSerializer;
 import io.pravega.connectors.presto.decoder.KVSerializer;
 import io.pravega.connectors.presto.decoder.MultiSourceRowDecoder;
@@ -39,15 +37,12 @@ import com.facebook.presto.spi.RecordSet;
 import com.facebook.presto.spi.connector.ConnectorRecordSetProvider;
 import com.facebook.presto.spi.connector.ConnectorTransactionHandle;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import io.pravega.schemaregistry.serializer.shared.impl.SerializerConfig;
 
 import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import static io.pravega.connectors.presto.PravegaHandleResolver.convertSplit;
@@ -68,18 +63,15 @@ public class PravegaRecordSetProvider
         implements ConnectorRecordSetProvider
 {
     private static final Logger log = Logger.get(PravegaRecordSetProvider.class);
-    private DispatchingRowDecoderFactory decoderFactory;
+    private JsonRowDecoderFactory jsonRowDecoderFactory;
     private final PravegaSegmentManager streamReaderManager;
-    private final PravegaConnectorConfig config;
 
     @Inject
-    public PravegaRecordSetProvider(DispatchingRowDecoderFactory decoderFactory,
-                                    PravegaSegmentManager streamReaderManager,
-                                    PravegaConnectorConfig config)
+    public PravegaRecordSetProvider(JsonRowDecoderFactory jsonRowDecoderFactory,
+                                    PravegaSegmentManager streamReaderManager)
     {
-        this.decoderFactory = requireNonNull(decoderFactory, "decoderFactory is null");
+        this.jsonRowDecoderFactory = requireNonNull(jsonRowDecoderFactory, "jsonRowDecoderFactory is null");
         this.streamReaderManager = requireNonNull(streamReaderManager, "streamReaderManager is null");
-        this.config = requireNonNull(config, "config is null");
     }
 
     @Override
@@ -208,16 +200,8 @@ public class PravegaRecordSetProvider
                 return new ProtobufRowDecoder(decoderColumnHandles);
 
             case JSON:
-            case JSON_INLINE: {
-                RowDecoder rowDecoder = decoderFactory.create(
-                        JSON,
-                        getDecoderParameters(schema.getSchemaLocation()),
-                        decoderColumnHandles);
-                if (!(rowDecoder instanceof com.facebook.presto.decoder.json.JsonRowDecoder)) {
-                    throw new IllegalStateException();
-                }
-                return new JsonRowDecoder((com.facebook.presto.decoder.json.JsonRowDecoder) rowDecoder);
-            }
+            case JSON_INLINE:
+                return jsonRowDecoderFactory.create(decoderColumnHandles);
 
             case CSV: {
                 return new CsvRowDecoder();
@@ -225,12 +209,5 @@ public class PravegaRecordSetProvider
             default:
                 throw new IllegalArgumentException(schema.toString());
         }
-    }
-
-    private static Map<String, String> getDecoderParameters(Optional<String> dataSchema)
-    {
-        ImmutableMap.Builder<String, String> parameters = ImmutableMap.builder();
-        dataSchema.ifPresent(schema -> parameters.put("dataSchema", schema));
-        return parameters.build();
     }
 }
