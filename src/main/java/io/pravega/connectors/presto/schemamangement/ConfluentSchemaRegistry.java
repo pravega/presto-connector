@@ -16,28 +16,44 @@
 package io.pravega.connectors.presto.schemamangement;
 
 import com.facebook.presto.spi.SchemaTableName;
+import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import io.pravega.connectors.presto.ObjectType;
 import io.pravega.connectors.presto.PravegaStreamDescription;
+import io.pravega.connectors.presto.PravegaStreamFieldDescription;
 import io.pravega.connectors.presto.PravegaStreamFieldGroup;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
+import static io.pravega.connectors.presto.util.PravegaNameUtils.temp_tableNameToStreamName;
+import static io.pravega.connectors.presto.util.PravegaSchemaUtils.AVRO;
+import static io.pravega.connectors.presto.util.PravegaStreamDescUtils.mapFieldsFromSchema;
 
 public class ConfluentSchemaRegistry
         implements SchemaRegistry
 {
-    //private final SchemaRegistryClient schemaRegistryClient;
+    private final SchemaRegistryClient schemaRegistryClient;
 
     public ConfluentSchemaRegistry(URI registryURI)
     {
-        //this.schemaRegistryClient = new CachedSchemaRegistryClient(registryURI.toASCIIString(), Integer.MAX_VALUE);
+        this.schemaRegistryClient = new CachedSchemaRegistryClient(registryURI.toASCIIString(), Integer.MAX_VALUE);
     }
 
     @Override
     public List<PravegaStreamFieldGroup> getSchema(SchemaTableName schemaTableName)
     {
-        /*
         try {
             SchemaMetadata metadata = schemaRegistryClient.getLatestSchemaMetadata(format(schemaTableName));
+            if (!metadata.getSchemaType().equalsIgnoreCase(AVRO)) {
+                throw new UnsupportedOperationException("schema type '" + metadata.getSchemaType() + "' is not supported");
+            }
 
             List<PravegaStreamFieldDescription> fields =
                     mapFieldsFromSchema("", AVRO, metadata.getSchema());
@@ -51,17 +67,29 @@ public class ConfluentSchemaRegistry
         catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        catch (Exception e) {
+        catch (RestClientException e) {
+            if (e.getStatus() == 404) {
+                return null;
+            }
             throw new RuntimeException(e);
         }
-         */
-        return null;
     }
 
     @Override
     public PravegaStreamDescription getTable(SchemaTableName schemaTableName)
     {
-        return null;
+        List<PravegaStreamFieldGroup> schema = getSchema(schemaTableName);
+        if (schema == null) {
+            return null;
+        }
+
+        return new PravegaStreamDescription(
+                schemaTableName.getTableName(),
+                Optional.of(schemaTableName.getSchemaName()),
+                temp_tableNameToStreamName(schemaTableName.getTableName()),
+                Optional.of(ObjectType.STREAM),
+                Optional.empty() /* args */,
+                Optional.of(schema));
     }
 
     static String format(SchemaTableName schemaTableName)

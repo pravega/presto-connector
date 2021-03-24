@@ -103,7 +103,7 @@ public class PravegaTableDescriptionSupplier
             });
         }
         else {
-            log.info("serving listSchemas() from cache");
+            log.debug("serving listSchemas() from cache");
         }
         return schemas;
     }
@@ -143,7 +143,7 @@ public class PravegaTableDescriptionSupplier
                 });
             }
             else {
-                log.info("serving listTables(%s) from cache", s);
+                log.debug("serving listTables(%s) from cache", s);
             }
 
             tableList.addAll(tableCache.asMap().keySet().stream()
@@ -159,7 +159,7 @@ public class PravegaTableDescriptionSupplier
         PravegaTableName pravegaTableName = new PravegaTableName(schemaTableName);
         Optional<PravegaStreamDescription> cachedTable = tableCache.getIfPresent(pravegaTableName);
         if (cachedTable != null && cachedTable.isPresent()) {
-            log.info("serving getTable(%s) from cache", schemaTableName);
+            log.debug("serving getTable(%s) from cache", schemaTableName);
             return cachedTable.get();
         }
 
