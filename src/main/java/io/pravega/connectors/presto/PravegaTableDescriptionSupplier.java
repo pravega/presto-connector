@@ -138,7 +138,16 @@ public class PravegaTableDescriptionSupplier
                     }
 
                     if (multiSourceStream(table)) {
-                        compositeStreams.add(Pattern.compile(table.getObjectName()));
+                        // if component streams specified look for exact match when hiding
+                        if (table.getObjectArgs().isPresent()) {
+                            table.getObjectArgs().get().forEach(arg -> {
+                                compositeStreams.add(Pattern.compile("^" + arg + "$"));
+                            });
+                        }
+                        else {
+                            // regex, fuzzy match
+                            compositeStreams.add(Pattern.compile(table.getObjectName()));
+                        }
                     }
                 });
             }
@@ -166,7 +175,10 @@ public class PravegaTableDescriptionSupplier
         PravegaStreamDescription table = schemaRegistry.getTable(schemaTableName);
 
         if (multiSourceStream(table)) {
-            List<String> objectArgs = multiSourceStreamComponents(schemaTableName, table.getObjectName());
+            // if component streams not already specified, look them up from pravega based on regex
+            List<String> objectArgs = table.getObjectArgs().isPresent()
+                    ? table.getObjectArgs().get()
+                    : multiSourceStreamComponents(schemaTableName, table.getObjectName());
             if (objectArgs.isEmpty()) {
                 throw new IllegalArgumentException("could not get component streams for " + schemaTableName);
             }

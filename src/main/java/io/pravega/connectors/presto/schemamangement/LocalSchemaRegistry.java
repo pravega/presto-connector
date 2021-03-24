@@ -50,6 +50,7 @@ public class LocalSchemaRegistry
     @Override
     public List<String> listSchemas()
     {
+        // file name format: {schema}.{table}.json
         return localSchemaStream()
                 .map(file -> file.getName().split("\\.")[0])
                 .collect(Collectors.toList());
@@ -60,9 +61,12 @@ public class LocalSchemaRegistry
     {
         final List<PravegaTableHandle> tables = new ArrayList<>();
 
+        // file name format: {schema}.{table}.json
         localSchemaStream()
                 .filter(file -> file.getName().startsWith(schema))
+                // ensures matches full file name format
                 .filter(file -> file.getName().split("\\.").length == 3)
+                // {table} from file name
                 .map(file -> file.getName().split("\\.")[1])
                 .map(file -> getLocalTable(new SchemaTableName(schema, file)))
                 .forEach(table -> {

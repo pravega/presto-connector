@@ -51,6 +51,11 @@ public final class PravegaTableHandle
      */
     private final String objectName;
 
+    /**
+     * optional
+     * for ObjectType.STREAM, this is list of composite streams in a multi source stream
+     * for ObjectType.KV_TABLE this is list of key families
+     */
     private final Optional<List<String>> objectArgs;
 
     private final List<PravegaObjectSchema> schema;
@@ -117,7 +122,7 @@ public final class PravegaTableHandle
     }
 
     @JsonProperty
-    public Optional<List<String>> getOjectArgs()
+    public Optional<List<String>> getObjectArgs()
     {
         return objectArgs;
     }

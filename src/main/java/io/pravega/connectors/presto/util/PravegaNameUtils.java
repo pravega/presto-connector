@@ -52,19 +52,23 @@ public class PravegaNameUtils
         return scope + "." + stream;
     }
 
-    // test stream name - if not valid pravega stream name assume it is regex for multi source
     public static boolean multiSourceStream(PravegaStreamDescription object)
     {
+        // if stream name is a regex, or if there are object args
+        // (objectArgs for stream are comma sep list of component streams)
         return object.getObjectType() == ObjectType.STREAM &&
-                multiSourceStream(object.getObjectName());
+                (multiSourceStream(object.getObjectName()) || object.getObjectArgs().isPresent());
     }
 
     public static boolean multiSourceStream(PravegaTableHandle object)
     {
+        // if stream name is a regex, or if there are object args
+        // (objectArgs for stream are comma sep list of component streams)
         return object.getObjectType() == ObjectType.STREAM &&
-                multiSourceStream(object.getObjectName());
+                (multiSourceStream(object.getObjectName()) || object.getObjectArgs().isPresent());
     }
 
+    // test stream name - if not valid pravega stream name assume it is regex for multi source
     public static boolean multiSourceStream(String stream)
     {
         try {
