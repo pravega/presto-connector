@@ -17,7 +17,6 @@
 package io.pravega.connectors.presto;
 
 import com.facebook.airlift.configuration.Config;
-import com.facebook.airlift.configuration.ConfigSecuritySensitive;
 
 import javax.validation.constraints.NotNull;
 
@@ -50,14 +49,6 @@ public class PravegaConnectorConfig {
      */
     private File tableDescriptionDir = new File("etc/pravega/");
 
-
-    private String awsAccessKey;
-
-    private String awsSecretKey;
-
-    private String awsRegion = "us-east-1";
-
-    private String awsGlueSchemaRegistry;
 
     private URI confluentSchemaRegistry;
 
@@ -108,47 +99,6 @@ public class PravegaConnectorConfig {
         return this;
     }
 
-    @Config("pravega.aws.accessKey")
-    @ConfigSecuritySensitive
-    public PravegaConnectorConfig setAwsAccessKey(String awsAccessKey) {
-        this.awsAccessKey = awsAccessKey;
-        return this;
-    }
-
-    public String getAwsAccessKey() {
-        return awsAccessKey;
-    }
-
-    @Config("pravega.aws.secretKey")
-    @ConfigSecuritySensitive
-    public PravegaConnectorConfig setAwsSecretKey(String awsSecretKey) {
-        this.awsSecretKey = awsSecretKey;
-        return this;
-    }
-
-    public String getAwsSecretKey() {
-        return awsSecretKey;
-    }
-
-    @Config("pravega.aws.region")
-    public PravegaConnectorConfig setAwsRegion(String awsRegion) {
-        this.awsRegion = awsRegion;
-        return this;
-    }
-
-    public String getAwsRegion() {
-        return awsRegion;
-    }
-
-    @Config("pravega.aws.glue.schema-registry")
-    public PravegaConnectorConfig setAwsGlueSchemaRegistry(String awsGlueSchemaRegistry) {
-        this.awsGlueSchemaRegistry = awsGlueSchemaRegistry;
-        return this;
-    }
-
-    public String getAwsGlueSchemaRegistry() {
-        return awsGlueSchemaRegistry;
-    }
 
     @Config("pravega.confluentSchemaRegistry")
     public PravegaConnectorConfig setConfluentSchemaRegistry(URI confluentSchemaRegistry) {

@@ -54,6 +54,8 @@ dependencies {
     compile "com.facebook.presto:presto-spi:${prestoVersion}"
     compile "com.facebook.presto:presto-common:${prestoVersion}"
 
+    compile "io.confluent:kafka-schema-registry-client:${confluentVersion}"
+
     runtimeOnly "io.airlift:joda-to-java-time-bridge:3"
     runtimeOnly "com.facebook.airlift:log-manager:${airliftLogManagerVersion}"
     runtimeOnly "org.apache.zookeeper:zookeeper:${zookeeperVersion}"
@@ -108,3 +110,4 @@ test {
         }
     }
 }
+
