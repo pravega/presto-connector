@@ -3,6 +3,7 @@
     <test name="unit-test">
         <packages>
             <package name="io.pravega.connectors.presto"/>
+            <package name="io.pravega.connectors.presto.decoder"/>
         </packages>
     </test>
 </suite>
