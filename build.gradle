@@ -12,6 +12,7 @@ apply from: "$rootDir/gradle/checkstyle.gradle"
 
 repositories {
     mavenLocal()
+
     maven {
         url = uri('https://oss.jfrog.org/jfrog-dependencies')
     }
@@ -54,6 +55,8 @@ dependencies {
     compile "com.facebook.presto:presto-spi:${prestoVersion}"
     compile "com.facebook.presto:presto-common:${prestoVersion}"
 
+    compile group: 'io.netty', name: 'netty-all', version:"{nettyVersion}"
+
     runtimeOnly "io.airlift:joda-to-java-time-bridge:3"
     runtimeOnly "com.facebook.airlift:log-manager:${airliftLogManagerVersion}"
     runtimeOnly "org.apache.zookeeper:zookeeper:${zookeeperVersion}"
@@ -73,9 +76,16 @@ version = '0.1.0'
 description = 'Pravega SQL :: Pravega PrestoDB Connector'
 sourceCompatibility = '1.8'
 
-task getHomeDir {
-    doLast {
-        println gradle.gradleHomeDir
+task copyDependentJars(type: Copy) {
+    from configurations.runtime
+    into "$buildDir/plugin/libs/pravega"
+}
+
+jar {
+    baseName = 'pravega-connector'
+    destinationDir = file("$buildDir/plugin/libs/pravega")
+    manifest {
+        attributes "Main-Class": "com.facebook.presto.pravega"
     }
 }
 
@@ -91,7 +101,6 @@ distributions {
         contents {
             distributionBaseName = 'pravega-presto-connector'
             from jar
-            from(project.configurations.runtime)
         }
     }
 }
@@ -99,3 +108,5 @@ distributions {
 test {
     useTestNG()
 }
+
+jar.dependsOn(copyDependentJars)

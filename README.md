@@ -81,29 +81,15 @@ Use the following options to create a run configuration that runs the Presto ser
 
 * Main Class: 'com.facebook.presto.server.PrestoServer'
 * VM Options: '-ea -XX:+UseG1GC -XX:G1HeapRegionSize=32M -XX:+UseGCOverheadLimit -XX:+ExplicitGCInvokesConcurrent -Xmx2G -Dconfig=etc/config.properties -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true -Dlog.levels-file=etc/log.properties'
-* Working directory: '/root/presto'
+* Working directory: '$MODULE_DIR$'
 * Use classpath of module: 'pravega.main'
+* Add a 'Before Launch' task - Add a gradle task to run the 'jar' task for the 'presto-connector' Gradle project.
 
-The working directory should be manually created and set to where the configuration properties files are located on your host.
-
-    [root@lrmk226 ~]# find /root/presto -ls
-    537429121    0 drwxr-xr-x   4 root     root           28 Mar 10 10:40 /root/presto
-    537429123    0 drwxr-xr-x   4 root     root           97 Mar  2 17:12 /root/presto/etc
-    805328026    0 drwxr-xr-x   2 root     root           32 Mar  3 15:58 /root/presto/etc/catalog
-    816318053    4 -rw-r--r--   1 root     root          119 Mar  3 15:58 /root/presto/etc/catalog/pravega.properties
-    272367596    0 drwxr-xr-x   2 root     root            6 Mar  2 17:04 /root/presto/etc/pravega
-    537429402    4 -rw-r--r--   1 root     root          854 Mar  2 17:10 /root/presto/etc/config.properties
-    537429389    4 -rw-r--r--   1 root     root          351 Mar  2 17:11 /root/presto/etc/jvm.config
-    537435775    4 -rw-r--r--   1 root     root          378 Mar  2 17:12 /root/presto/etc/log.properties
-    575879       0 drwxr-xr-x   3 root     root           17 Mar  2 17:17 /root/presto/var
-    268833640    0 drwxr-xr-x   2 root     root           30 Mar 10 10:42 /root/presto/var/log
-    272373839   12 -rw-r--r--   1 root     root        11230 Mar 10 10:42 /root/presto/var/log/http-request.log
-
-Create the pravega.properties file in /root/presto/etc/catalog as previously described.
+Modify the pravega.properties file in etc/catalog as previously described to point to a running Pravega controller, and a running Schema Registry.
 
 ## Schema Definitions
 
-Currently, you must manually create schema definitions using a JSON file. In future releases, the 'CREATE TABLE' Presto command will be available.  The JSON configuration files are read at server startup, and should be located in /etc/presto/pravega directory.  In the JSON schema example below, "customer" is a stream name in the tpch pravega scope.
+Currently, you must manually create schema definitions using a JSON file. In future releases, the 'CREATE TABLE' Presto command will be available.  The JSON configuration files are read at server startup, and should be located in etc/pravega directory.  In the JSON schema example below, "customer" is a stream name in the tpch pravega scope.
 
     {
         "tableName": "customer",
