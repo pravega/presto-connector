@@ -55,7 +55,7 @@ dependencies {
     compile "com.facebook.presto:presto-spi:${prestoVersion}"
     compile "com.facebook.presto:presto-common:${prestoVersion}"
 
-    runtimeOnly group: 'io.netty', name: 'netty-all', version:"{nettyVersion}"
+    compile group: 'io.netty', name: 'netty-all', version:"{nettyVersion}"
 
     runtimeOnly "io.airlift:joda-to-java-time-bridge:3"
     runtimeOnly "com.facebook.airlift:log-manager:${airliftLogManagerVersion}"
