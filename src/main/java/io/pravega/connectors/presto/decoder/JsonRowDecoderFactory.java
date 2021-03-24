@@ -11,7 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Note: This class file is from PrestoDb (rev cb21100597c1aec4c6f29e4a82117886aaa95d10)
+ * Note: This class file is from PrestoDb
+ * (rev cb21100597c1aec4c6f29e4a82117886aaa95d10)
  * https://github.com/prestodb/presto/blob/0.235/presto-record-decoder/src/main/java/com/facebook/presto/decoder/json/JsonRowDecoderFactory.java
  */
 package io.pravega.connectors.presto.decoder;
