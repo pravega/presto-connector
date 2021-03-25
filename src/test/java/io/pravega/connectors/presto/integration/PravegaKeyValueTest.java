@@ -30,13 +30,13 @@ import static io.pravega.connectors.presto.integration.PravegaTestUtils.getKvStr
 import static org.testng.Assert.assertEquals;
 
 @Test
-public class TestPravegaKeyValue
+public class PravegaKeyValueTest
 {
     private final EmbeddedPravega pravega;
 
     private final DistributedQueryRunner queryRunner;
 
-    public TestPravegaKeyValue()
+    public PravegaKeyValueTest()
             throws Exception
     {
         this.pravega = new EmbeddedPravega();

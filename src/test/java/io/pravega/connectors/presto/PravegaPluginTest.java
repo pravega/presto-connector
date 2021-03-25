@@ -25,7 +25,7 @@ import static com.facebook.airlift.testing.Assertions.assertInstanceOf;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static org.testng.Assert.assertNotNull;
 
-public class TestPravegaPlugin
+public class PravegaPluginTest
 {
     @Test
     public void testSpinup()
