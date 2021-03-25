@@ -133,4 +133,9 @@ public final class PravegaTestUtils
     {
         return new Schema.Parser().parse(streamDescription.getEvent().get().get(event).getDataSchema().get());
     }
+
+    public static Schema avroSchema(String avroSchemaString)
+    {
+        return new Schema.Parser().parse(avroSchemaString);
+    }
 }

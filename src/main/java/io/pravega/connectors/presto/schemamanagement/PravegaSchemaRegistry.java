@@ -16,6 +16,7 @@
 package io.pravega.connectors.presto.schemamanagement;
 
 import com.facebook.presto.spi.SchemaTableName;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import io.pravega.client.ClientConfig;
@@ -65,6 +66,13 @@ public class PravegaSchemaRegistry
                 SchemaRegistryClientConfig.builder().schemaRegistryUri(schemaRegistryURI).build();
         this.registryClient = SchemaRegistryClientFactory.withDefaultNamespace(registryConfig);
         this.streamManager = StreamManager.create(ClientConfig.builder().controllerURI(controllerURI).build());
+    }
+
+    @VisibleForTesting
+    public PravegaSchemaRegistry(SchemaRegistryClient registryClient, StreamManager streamManager)
+    {
+        this.registryClient = registryClient;
+        this.streamManager = streamManager;
     }
 
     @Override
