@@ -4,6 +4,7 @@
         <packages>
             <package name="io.pravega.connectors.presto"/>
             <package name="io.pravega.connectors.presto.decoder"/>
+            <package name="io.pravega.connectors.presto.schemamanagement"/>
         </packages>
     </test>
 </suite>

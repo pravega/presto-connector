@@ -22,7 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import io.pravega.connectors.presto.schemamangement.CompositeSchemaRegistry;
+import io.pravega.connectors.presto.schemamanagement.CompositeSchemaRegistry;
 
 import javax.inject.Inject;
 

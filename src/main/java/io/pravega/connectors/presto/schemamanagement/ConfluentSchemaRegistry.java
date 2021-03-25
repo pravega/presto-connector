@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.pravega.connectors.presto.schemamangement;
+package io.pravega.connectors.presto.schemamanagement;
 
 import com.facebook.presto.spi.SchemaTableName;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;

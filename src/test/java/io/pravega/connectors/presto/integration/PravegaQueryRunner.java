@@ -35,6 +35,8 @@ import io.pravega.connectors.presto.PravegaPlugin;
 import io.pravega.connectors.presto.PravegaStreamDescription;
 import io.pravega.connectors.presto.PravegaTableDescriptionSupplier;
 import io.pravega.connectors.presto.PravegaTableName;
+import io.pravega.connectors.presto.util.CodecSupplier;
+import io.pravega.connectors.presto.util.PravegaTestUtils;
 
 import java.net.URI;
 import java.util.Map;
@@ -44,8 +46,8 @@ import static com.facebook.airlift.testing.Closeables.closeAllSuppress;
 import static com.facebook.presto.testing.TestingSession.testSessionBuilder;
 import static com.facebook.presto.tpch.TpchMetadata.TINY_SCHEMA_NAME;
 import static io.airlift.units.Duration.nanosSince;
-import static io.pravega.connectors.presto.integration.PravegaTestUtils.getKvStreamDesc;
-import static io.pravega.connectors.presto.integration.PravegaTestUtils.getStreamDesc;
+import static io.pravega.connectors.presto.util.PravegaTestUtils.getKvStreamDesc;
+import static io.pravega.connectors.presto.util.PravegaTestUtils.getStreamDesc;
 import static java.util.Locale.ENGLISH;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -122,7 +124,7 @@ public final class PravegaQueryRunner
 
     private static PravegaTableDescriptionSupplier createSchemas(Metadata metadata, Iterable<TpchTable<?>> tables, Iterable<String> keyValueTables)
     {
-        JsonCodec<PravegaStreamDescription> streamDescCodec = new CodecSupplier<>(PravegaStreamDescription.class, metadata).get();
+        JsonCodec<PravegaStreamDescription> streamDescCodec = new CodecSupplier<>(PravegaStreamDescription.class, metadata.getFunctionAndTypeManager()).get();
 
         Cache<String, Object> schemaCache = CacheBuilder.newBuilder().build();
         Cache<PravegaTableName, Optional<PravegaStreamDescription>> tableCache = CacheBuilder.newBuilder().build();

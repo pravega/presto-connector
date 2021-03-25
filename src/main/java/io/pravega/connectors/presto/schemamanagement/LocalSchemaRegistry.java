@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.pravega.connectors.presto.schemamangement;
+package io.pravega.connectors.presto.schemamanagement;
 
 import com.facebook.airlift.json.JsonCodec;
 import com.facebook.presto.spi.SchemaTableName;
@@ -53,6 +53,7 @@ public class LocalSchemaRegistry
         // file name format: {schema}.{table}.json
         return localSchemaStream()
                 .map(file -> file.getName().split("\\.")[0])
+                .distinct()
                 .collect(Collectors.toList());
     }
 
