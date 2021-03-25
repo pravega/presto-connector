@@ -26,33 +26,31 @@ import io.pravega.connectors.presto.util.PravegaTestUtils;
 import org.testng.annotations.Test;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 @Test
 public class LocalSchemaRegistryTest
 {
+    // uses resources/tpch for table description dir
+
     @Test
     public void testListSchemas()
     {
-        LocalSchemaRegistry schemaRegistry = PravegaTestUtils.localSchemaRegistry();
+        LocalSchemaRegistry schemaRegistry = PravegaTestUtils.localSchemaRegistry("tpch");
 
         List<String> schemas = schemaRegistry.listSchemas();
-
-        assertEquals(schemas.size(), 2);
-
-        schemas = schemas.stream().sorted().collect(Collectors.toList());
-        assertEquals(schemas.get(0), "kv");
+        assertEquals(schemas.size(), 1);
         assertEquals(schemas.get(1), "tpch");
     }
 
     @Test
     public void testListTables()
     {
-        LocalSchemaRegistry schemaRegistry = PravegaTestUtils.localSchemaRegistry();
+        LocalSchemaRegistry schemaRegistry = PravegaTestUtils.localSchemaRegistry("tpch");
 
         List<PravegaTableHandle> tables = schemaRegistry.listTables("tpch");
         assertEquals(tables.size(), 8);
@@ -61,12 +59,13 @@ public class LocalSchemaRegistryTest
                 tables.stream().filter(h -> h.getTableName().equals("customer")).findFirst().get();
         assertEquals(customerTableHandle.getSchemaName(), "tpch");
         assertEquals(customerTableHandle.getTableName(), "customer");
+        assertEquals(customerTableHandle.getObjectName(), "customer");
     }
 
     @Test
     public void testGetSchema()
     {
-        LocalSchemaRegistry schemaRegistry = PravegaTestUtils.localSchemaRegistry();
+        LocalSchemaRegistry schemaRegistry = PravegaTestUtils.localSchemaRegistry("tpch");
 
         List<PravegaStreamFieldGroup> schema =
                 schemaRegistry.getSchema(new SchemaTableName("tpch", "customer"));
@@ -80,7 +79,7 @@ public class LocalSchemaRegistryTest
     @Test
     public void testGetTable()
     {
-        LocalSchemaRegistry schemaRegistry = PravegaTestUtils.localSchemaRegistry();
+        LocalSchemaRegistry schemaRegistry = PravegaTestUtils.localSchemaRegistry("tpch");
 
         PravegaStreamDescription table =
                 schemaRegistry.getTable(new SchemaTableName("tpch", "customer"));
@@ -92,8 +91,17 @@ public class LocalSchemaRegistryTest
         validateCustomerSchema(table.getEvent().get().get(0));
     }
 
+    @Test
+    public void testTableDoesNotExist()
+    {
+        LocalSchemaRegistry schemaRegistry = PravegaTestUtils.localSchemaRegistry("tpch");
+        assertNull(schemaRegistry.getTable(new SchemaTableName("tpch", "abcxyz123")));
+    }
+
     private void validateCustomerSchema(PravegaStreamFieldGroup fieldGroup)
     {
+        // spot check a fiew fields
+
         assertEquals(fieldGroup.getDataFormat(), "json");
         assertEquals(fieldGroup.getFields().size(), 8);
 

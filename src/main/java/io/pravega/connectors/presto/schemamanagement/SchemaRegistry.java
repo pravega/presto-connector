@@ -21,6 +21,9 @@ import io.pravega.connectors.presto.PravegaStreamFieldGroup;
 
 import java.util.List;
 
+/**
+ * return schema for the given schema.table
+ */
 public interface SchemaRegistry
 {
     PravegaStreamDescription getTable(SchemaTableName schemaTableName);

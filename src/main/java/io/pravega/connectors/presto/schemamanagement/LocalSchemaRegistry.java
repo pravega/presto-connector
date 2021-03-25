@@ -108,7 +108,7 @@ public class LocalSchemaRegistry
 
         // at least 1 schema for a fieldGroup must be resolved.  read schema from local file or url
         List<PravegaStreamFieldGroup> finalSchemas =
-                resolveAllSchemas(table.getEvent().get(), (i) -> columnPrefix(table, i));
+                resolveAllSchemas(localTableDir, table.getEvent().get(), (i) -> columnPrefix(table, i));
 
         return new PravegaStreamDescription(table, finalSchemas);
     }

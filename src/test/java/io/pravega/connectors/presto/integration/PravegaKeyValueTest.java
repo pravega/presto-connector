@@ -18,7 +18,6 @@ package io.pravega.connectors.presto.integration;
 import com.facebook.presto.Session;
 import com.facebook.presto.testing.MaterializedResult;
 import com.facebook.presto.tests.DistributedQueryRunner;
-import io.airlift.tpch.TpchTable;
 import io.pravega.connectors.presto.PravegaStreamDescription;
 import io.pravega.connectors.presto.PravegaStreamFieldDescription;
 import org.testng.annotations.AfterClass;
@@ -41,7 +40,7 @@ public class PravegaKeyValueTest
             throws Exception
     {
         this.pravega = new EmbeddedPravega();
-        this.queryRunner = PravegaQueryRunner.createQueryRunner(pravega.getController(), TpchTable.getTables(), KeyValueTable.getTables());
+        this.queryRunner = PravegaQueryRunner.createQueryRunner(pravega.getController(), java.util.Collections.emptyList(), KeyValueTable.getTables());
     }
 
     @Test

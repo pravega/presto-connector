@@ -29,6 +29,7 @@ import org.everit.json.schema.ObjectSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.StringSchema;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -351,11 +352,13 @@ public class PravegaStreamDescUtils
      * PravegaStreamFieldGroup may contain pointer to schema (local file, or url)
      * for these, read the schema and build the field definitions
      *
+     * @param schemaDir directory where we can find the schema
      * @param fieldGroups fieldGroups to look through
      * @param columnPrefix function to return columnPrefix to be used for the fields in the group
      * @return list of PravegaStreamFieldGroup with all schemas resolved
      */
-    public static List<PravegaStreamFieldGroup> resolveAllSchemas(List<PravegaStreamFieldGroup> fieldGroups,
+    public static List<PravegaStreamFieldGroup> resolveAllSchemas(File schemaDir,
+                                                                  List<PravegaStreamFieldGroup> fieldGroups,
                                                                   Function<Integer, String> columnPrefix)
     {
         // fields already defined
@@ -369,7 +372,7 @@ public class PravegaStreamDescUtils
         for (int i = 0; i < fieldGroups.size(); i++) {
             PravegaStreamFieldGroup fieldGroup = fieldGroups.get(i);
             if (fieldGroup.getDataSchema().isPresent()) {
-                String dataSchema = readSchema(fieldGroup.getDataSchema().get());
+                String dataSchema = readSchema(schemaDir, fieldGroup.getDataSchema().get());
                 List<PravegaStreamFieldDescription> fields =
                         mapFieldsFromSchema(columnPrefix.apply(i), fieldGroup.getDataFormat(), dataSchema);
                 finalSchemas.add(new PravegaStreamFieldGroup(fieldGroup, dataSchema, fields));

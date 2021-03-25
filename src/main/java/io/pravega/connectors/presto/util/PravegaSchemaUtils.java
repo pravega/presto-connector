@@ -20,6 +20,7 @@ import com.facebook.airlift.log.Logger;
 import com.facebook.presto.spi.PrestoException;
 import com.google.common.io.CharStreams;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +55,7 @@ public class PravegaSchemaUtils
 
     public static final String NESTED_RECORD_SEPARATOR = "/";
 
-    public static String readSchema(String dataSchemaLocation)
+    public static String readSchema(File schemaDir, String dataSchemaLocation)
     {
         InputStream inputStream = null;
         try {
@@ -65,7 +66,7 @@ public class PravegaSchemaUtils
                 catch (MalformedURLException e) {
                     // try again before failing
                     log.warn("invalid URL: " + dataSchemaLocation);
-                    inputStream = new FileInputStream(dataSchemaLocation);
+                    inputStream = new FileInputStream(new File(schemaDir, dataSchemaLocation));
                 }
             }
             else {

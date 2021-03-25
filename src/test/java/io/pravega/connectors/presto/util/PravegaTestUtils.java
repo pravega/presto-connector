@@ -18,13 +18,10 @@ package io.pravega.connectors.presto.util;
 import com.facebook.airlift.json.JsonCodec;
 import com.facebook.presto.common.QualifiedObjectName;
 import com.facebook.presto.metadata.FunctionAndTypeManager;
+import com.facebook.presto.spi.SchemaTableName;
 import com.facebook.presto.tests.TestingPrestoClient;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.CharStreams;
 import io.pravega.client.admin.StreamManager;
 import io.pravega.connectors.presto.PravegaStreamDescription;
-import io.pravega.connectors.presto.PravegaStreamFieldDescription;
-import io.pravega.connectors.presto.PravegaStreamFieldGroup;
 import io.pravega.connectors.presto.integration.PravegaKeyValueLoader;
 import io.pravega.connectors.presto.integration.PravegaLoader;
 import io.pravega.connectors.presto.schemamanagement.LocalSchemaRegistry;
@@ -38,42 +35,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
-import static io.pravega.connectors.presto.util.PravegaStreamDescUtils.mapFieldsFromSchema;
 import static java.lang.String.format;
 
 public final class PravegaTestUtils
 {
     private PravegaTestUtils() {}
 
-    public static LocalSchemaRegistry localSchemaRegistry()
+    public static LocalSchemaRegistry localSchemaRegistry(String dir)
     {
         JsonCodec<PravegaStreamDescription> streamDescCodec = new CodecSupplier<>(
                 PravegaStreamDescription.class,
                 FunctionAndTypeManager.createTestFunctionAndTypeManager()).get();
-        return new LocalSchemaRegistry(new File("src/test/resources/etc").getAbsoluteFile(), streamDescCodec);
-    }
-
-    public static PravegaStreamDescription getStreamDesc(JsonCodec<PravegaStreamDescription> streamDescriptionCodec, String schema, String table)
-    {
-        try (InputStream inputStream = PravegaTestUtils.class.getResourceAsStream(String.format("/etc/%s.%s.json", schema, table))) {
-            return streamDescriptionCodec.fromJson(ByteStreams.toByteArray(inputStream));
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    public static String readSchema(String schema)
-    {
-        try (InputStreamReader reader = new InputStreamReader(PravegaTestUtils.class.getResourceAsStream(String.format("/etc/%s", schema)))) {
-            return CharStreams.toString(reader);
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        return new LocalSchemaRegistry(new File("src/test/resources/" + dir).getAbsoluteFile(), streamDescCodec);
     }
 
     public static void loadTpchStream(URI controller, StreamManager streamManager, TestingPrestoClient prestoClient, String schema, String stream, QualifiedObjectName tpchTableName)
@@ -98,8 +72,8 @@ public final class PravegaTestUtils
                              streamManager, schema, table,
                              avroSchema(tableDesc, 0),
                              avroSchema(tableDesc, 1))) {
-            try (InputStream inputStream = PravegaTestUtils.class.getResourceAsStream(String.format("/etc/%s.records", table));
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            try (InputStream inputStream = PravegaTestUtils.class.getResourceAsStream(String.format("/kv/%s.records", table));
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                 // each line in file is a record, key + value
                 // '|' character separates key fields from values fields
                 // fields separated by ','
@@ -152,31 +126,7 @@ public final class PravegaTestUtils
 
     public static PravegaStreamDescription getKvStreamDesc(String table)
     {
-        JsonCodec<PravegaStreamDescription> jsonCodec = JsonCodec.jsonCodec(PravegaStreamDescription.class);
-
-        PravegaStreamDescription streamDescription = getStreamDesc(jsonCodec, "kv", table);
-        streamDescription = getStreamDesc(jsonCodec, "tpch", "customer");
-        streamDescription.getEvent().orElseThrow(IllegalArgumentException::new);
-
-        PravegaStreamFieldGroup keyEvent = streamDescription.getEvent().get().get(0);
-        keyEvent.getDataSchema().orElseThrow(IllegalArgumentException::new);
-        String keySchema = PravegaTestUtils.readSchema(keyEvent.getDataSchema().get());
-
-        PravegaStreamFieldGroup valueEvent = streamDescription.getEvent().get().get(1);
-        valueEvent.getDataSchema().orElseThrow(IllegalArgumentException::new);
-        String valueSchema = PravegaTestUtils.readSchema(valueEvent.getDataSchema().get());
-
-        List<PravegaStreamFieldDescription> keyFields =
-                mapFieldsFromSchema("key", keyEvent.getDataFormat(), keySchema);
-
-        List<PravegaStreamFieldDescription> valueFields =
-                mapFieldsFromSchema("value", valueEvent.getDataFormat(), valueSchema);
-
-        List<PravegaStreamFieldGroup> newFieldGroups = new ArrayList<>(2);
-        newFieldGroups.add(new PravegaStreamFieldGroup(keyEvent, keySchema, keyFields));
-        newFieldGroups.add(new PravegaStreamFieldGroup(valueEvent, valueSchema, valueFields));
-
-        return new PravegaStreamDescription(streamDescription, newFieldGroups);
+        return localSchemaRegistry("kv").getTable(new SchemaTableName("kv", table));
     }
 
     public static Schema avroSchema(PravegaStreamDescription streamDescription, int event)

@@ -84,12 +84,12 @@ public class PravegaTableDescriptionSupplier
     }
 
     @VisibleForTesting
-    public PravegaTableDescriptionSupplier(Cache<String, Object> schemaCache,
-                                           Cache<PravegaTableName, Optional<PravegaStreamDescription>> tableCache)
+    public PravegaTableDescriptionSupplier(CompositeSchemaRegistry schemaRegistry)
     {
-        this.schemaCache = schemaCache;
-        this.tableCache = tableCache;
-        this.schemaRegistry = null;
+        this.schemaRegistry = schemaRegistry;
+
+        this.schemaCache = CacheBuilder.newBuilder().build();
+        this.tableCache = CacheBuilder.newBuilder().build();
     }
 
     public List<String> listSchemas()
@@ -174,6 +174,9 @@ public class PravegaTableDescriptionSupplier
         }
 
         PravegaStreamDescription table = schemaRegistry.getTable(schemaTableName);
+        if (table == null) {
+            return null;
+        }
 
         if (multiSourceStream(table)) {
             // if component streams not already specified, look them up from pravega based on regex

@@ -19,6 +19,10 @@ import io.pravega.connectors.presto.PravegaTableHandle;
 
 import java.util.List;
 
+/**
+ * a source of schemas, and tables
+ * this may be reading files on local disk or listing scopes+streams from pravega
+ */
 public interface SchemaSupplier
 {
     List<String> listSchemas();
