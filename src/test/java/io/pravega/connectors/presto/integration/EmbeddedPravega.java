@@ -8,6 +8,7 @@
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Note: this class is based on SetupUtils from pravega/flink-connectors
+ * (rev 9332ad67e520c03c7122de1d3b90c6cafbf97634)
  * https://github.com/pravega/flink-connectors/blob/v0.9.0/src/test/java/io/pravega/connectors/flink/utils/SetupUtils.java
  */
 package io.pravega.connectors.presto.integration;

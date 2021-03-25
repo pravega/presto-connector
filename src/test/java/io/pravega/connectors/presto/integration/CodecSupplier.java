@@ -12,6 +12,7 @@
  * limitations under the License.
  *
  * Note: This class file is from PrestoDb
+ * (rev a8968160e1840ac67a5f63def27d31c0ef0acde7)
  * https://github.com/prestodb/presto/blob/0.247/presto-kafka/src/test/java/com/facebook/presto/kafka/util/CodecSupplier.java
  */
 package io.pravega.connectors.presto.integration;
