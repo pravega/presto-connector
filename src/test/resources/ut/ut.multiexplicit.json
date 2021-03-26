@@ -1,0 +1,6 @@
+{
+  "schemaName": "ut",
+  "tableName": "multiexplicit",
+  "objectName": "multiexplicit",
+  "objectArgs": ["stream1", "stream3"]
+}

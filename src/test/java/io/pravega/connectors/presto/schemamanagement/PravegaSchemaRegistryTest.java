@@ -36,6 +36,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 
 import static io.pravega.connectors.presto.util.PravegaTestUtils.avroSchema;
+import static io.pravega.connectors.presto.util.TestSchemas.EMPLOYEE_AVSC;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -43,8 +44,6 @@ import static org.testng.Assert.assertTrue;
 @Test
 public class PravegaSchemaRegistryTest
 {
-    private static final String testSchema =
-            "{\"namespace\": \"io.pravega.avro\",\"type\": \"record\",\"name\": \"Employee\",\"fields\": [{\"name\": \"first\", \"type\": \"string\"},{\"name\": \"last\", \"type\": \"string\"}]}";
     @Test
     public void testListSchemas()
     {
@@ -84,7 +83,7 @@ public class PravegaSchemaRegistryTest
 
         SchemaRegistryClient schemaRegistryClient = new MockSchemaRegistryClient();
         schemaRegistryClient.addGroup(groupId(schemaTableName), groupProperties(false));
-        schemaRegistryClient.addSchema(groupId(schemaTableName), AvroSchema.of(avroSchema(testSchema)).getSchemaInfo());
+        schemaRegistryClient.addSchema(groupId(schemaTableName), AvroSchema.of(avroSchema(EMPLOYEE_AVSC)).getSchemaInfo());
 
 
         PravegaSchemaRegistry schemaRegistry = new PravegaSchemaRegistry(schemaRegistryClient, new MockStreamManager());
@@ -120,5 +119,4 @@ public class PravegaSchemaRegistryTest
     {
         return PravegaNameUtils.groupId(schemaTableName.getSchemaName(), schemaTableName.getTableName());
     }
-
 }
