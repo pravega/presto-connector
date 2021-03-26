@@ -23,7 +23,8 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.net.URI;
 
-public class PravegaConnectorConfig {
+public class PravegaConnectorConfig
+{
     /**
      * Pravega Controller URI
      */
@@ -53,55 +54,64 @@ public class PravegaConnectorConfig {
     private URI confluentSchemaRegistry;
 
     @NotNull
-    public URI getControllerURI() {
+    public URI getControllerURI()
+    {
         return this.controllerURI;
     }
 
     @NotNull
-    public URI getSchemaRegistryURI() {
+    public URI getSchemaRegistryURI()
+    {
         return this.schemaRegistryURI;
     }
 
     @NotNull
-    public File getTableDescriptionDir() {
+    public File getTableDescriptionDir()
+    {
         return tableDescriptionDir;
     }
 
     @Config("pravega.table-description-dir")
-    public PravegaConnectorConfig setTableDescriptionDir(File tableDescriptionDir) {
+    public PravegaConnectorConfig setTableDescriptionDir(File tableDescriptionDir)
+    {
         this.tableDescriptionDir = tableDescriptionDir;
         return this;
     }
 
-    public int getTableCacheExpireSecs() {
+    public int getTableCacheExpireSecs()
+    {
         return this.tableCacheExpireSecs;
     }
 
     @Config("pravega.controller")
-    public PravegaConnectorConfig setControllerURI(URI controllerURI) {
+    public PravegaConnectorConfig setControllerURI(URI controllerURI)
+    {
         this.controllerURI = controllerURI;
         return this;
     }
 
     @Config("pravega.schema-registry")
-    public PravegaConnectorConfig setSchemaRegistryURI(URI schemaRegistryURI) {
+    public PravegaConnectorConfig setSchemaRegistryURI(URI schemaRegistryURI)
+    {
         this.schemaRegistryURI = schemaRegistryURI;
         return this;
     }
 
-    public boolean isHideInternalColumns() {
+    public boolean isHideInternalColumns()
+    {
         return hideInternalColumns;
     }
 
     @Config("pravega.hide-internal-columns")
-    public PravegaConnectorConfig setHideInternalColumns(boolean hideInternalColumns) {
+    public PravegaConnectorConfig setHideInternalColumns(boolean hideInternalColumns)
+    {
         this.hideInternalColumns = hideInternalColumns;
         return this;
     }
 
-
     @Config("pravega.confluentSchemaRegistry")
-    public PravegaConnectorConfig setConfluentSchemaRegistry(URI confluentSchemaRegistry) {
+    public PravegaConnectorConfig setConfluentSchemaRegistry(URI confluentSchemaRegistry)
+    {
         this.confluentSchemaRegistry = confluentSchemaRegistry;
         return this;
     }
