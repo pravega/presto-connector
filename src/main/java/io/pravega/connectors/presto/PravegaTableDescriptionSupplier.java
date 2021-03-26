@@ -28,6 +28,7 @@ import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -59,6 +60,9 @@ public class PravegaTableDescriptionSupplier
 
     private Cache<PravegaTableName, Optional<PravegaStreamDescription>> tableCache;
 
+    // whether we have listed tables from this schema or not
+    private final HashMap<String, Boolean> tableListMap = new HashMap<>();
+
     private JsonCodec<PravegaStreamDescription> streamDescriptionCodec;
 
     @Inject
@@ -71,7 +75,7 @@ public class PravegaTableDescriptionSupplier
         // there will be many successive calls to listSchemas + listTables in short time period
         // do not reach out to pravega each time as it is unlikely things would have changed
         // enhancement issue - can we determine if there are changes/removals and selectively update?
-        // https://github.com/StreamingDataPlatform/pravega-sql/issues/101
+        // https://github.com/pravega/presto-connector/issues/30
         this.schemaCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(pravegaConnectorConfig.getTableCacheExpireSecs(), TimeUnit.SECONDS)
                 .build();
@@ -121,7 +125,7 @@ public class PravegaTableDescriptionSupplier
                             .filter(streamDesc -> streamDesc.getSchemaTableName().getSchemaName().startsWith(s))
                             .collect(Collectors.toList());
 
-            if (tableListForSchema.isEmpty()) {
+            if (tableListForSchema.isEmpty() || tableListMap.get(s) == null) {
 
                 List<Pattern> compositeStreams = new ArrayList<>();
 
@@ -151,6 +155,7 @@ public class PravegaTableDescriptionSupplier
                         }
                     }
                 });
+                tableListMap.put(s, true); // we have now listed tables from the schema
             }
             else {
                 log.debug("serving listTables(%s) from cache", s);
