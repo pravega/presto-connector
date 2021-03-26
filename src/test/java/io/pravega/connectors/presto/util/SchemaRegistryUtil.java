@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) Pravega Authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.pravega.connectors.presto.util;
 
 import com.facebook.presto.spi.SchemaTableName;
@@ -18,8 +33,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.pravega.connectors.presto.util.PravegaTestUtils.avroSchema;
-import static io.pravega.connectors.presto.util.TestSchemas.EMPLOYEE_AVSC;
 
+/**
+ * build CompositeSchemaRegistry for use in unit tests
+ */
 public class SchemaRegistryUtil
 {
     private final StreamManager streamManager;
@@ -59,21 +76,28 @@ public class SchemaRegistryUtil
         localSchemaRegistryList.add(PravegaTestUtils.localSchemaRegistry(dir));
     }
 
-    public boolean addPravegaSchema(String schema)
+    public boolean addSchema(String schema)
     {
         return streamManager.createScope(schema);
     }
 
-    public boolean addPravegaTable(SchemaTableName schemaTableName)
+    public boolean addTable(SchemaTableName schemaTableName)
     {
         return streamManager.createStream(schemaTableName.getSchemaName(),
                 schemaTableName.getTableName(),
                 null);
     }
 
-    public boolean addPravegaTable(SchemaTableName schemaTableName, String schema)
+    public boolean addTable(String schema, String stream)
     {
-        addPravegaTable(schemaTableName);
+        return addTable(new SchemaTableName(schema, stream));
+    }
+
+    public boolean addTable(SchemaTableName schemaTableName, String schema)
+    {
+        if (!addTable(schemaTableName)) {
+            return false;
+        }
         addAvroSchema(schemaTableName, schema);
         return true;
     }

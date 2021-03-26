@@ -65,7 +65,11 @@ public class MockSchemaRegistryClient
     @Override
     public GroupProperties getGroupProperties(String s) throws RegistryExceptions.ResourceNotFoundException, RegistryExceptions.UnauthorizedException
     {
-        return groups.get(s);
+        GroupProperties groupProperties = groups.get(s);
+        if (groupProperties == null) {
+            throw new RegistryExceptions.ResourceNotFoundException(s);
+        }
+        return groupProperties;
     }
 
     @Override

@@ -44,7 +44,7 @@ public class LocalSchemaRegistryTest
 
         List<String> schemas = schemaRegistry.listSchemas();
         assertEquals(schemas.size(), 1);
-        assertEquals(schemas.get(1), "tpch");
+        assertEquals(schemas.get(0), "tpch");
     }
 
     @Test

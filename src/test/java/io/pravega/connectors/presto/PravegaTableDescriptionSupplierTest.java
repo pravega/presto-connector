@@ -50,10 +50,10 @@ public class PravegaTableDescriptionSupplierTest
                 new PravegaTableDescriptionSupplier(schemaRegistryUtil.getSchemaRegistry());
 
 
-        schemaRegistryUtil.addPravegaSchema(SCHEMA);
-        schemaRegistryUtil.addPravegaTable(new SchemaTableName(SCHEMA, "stream1"), EMPLOYEE_AVSC);
-        schemaRegistryUtil.addPravegaTable(new SchemaTableName(SCHEMA, "stream2"), EMPLOYEE_AVSC);
-        schemaRegistryUtil.addPravegaTable(new SchemaTableName(SCHEMA, "stream3"), EMPLOYEE_AVSC);
+        schemaRegistryUtil.addSchema(SCHEMA);
+        schemaRegistryUtil.addTable(new SchemaTableName(SCHEMA, "stream1"), EMPLOYEE_AVSC);
+        schemaRegistryUtil.addTable(new SchemaTableName(SCHEMA, "stream2"), EMPLOYEE_AVSC);
+        schemaRegistryUtil.addTable(new SchemaTableName(SCHEMA, "stream3"), EMPLOYEE_AVSC);
 
         PravegaStreamDescription table =
                 tableSupplier.getTable(new SchemaTableName(SCHEMA, "multiregex"));
@@ -76,10 +76,10 @@ public class PravegaTableDescriptionSupplierTest
         PravegaTableDescriptionSupplier tableSupplier =
                 new PravegaTableDescriptionSupplier(schemaRegistryUtil.getSchemaRegistry());
 
-        schemaRegistryUtil.addPravegaSchema(SCHEMA);
-        schemaRegistryUtil.addPravegaTable(new SchemaTableName(SCHEMA, "stream1"), EMPLOYEE_AVSC);
-        schemaRegistryUtil.addPravegaTable(new SchemaTableName(SCHEMA, "stream2"), EMPLOYEE_AVSC);
-        schemaRegistryUtil.addPravegaTable(new SchemaTableName(SCHEMA, "stream3"), EMPLOYEE_AVSC);
+        schemaRegistryUtil.addSchema(SCHEMA);
+        schemaRegistryUtil.addTable(new SchemaTableName(SCHEMA, "stream1"), EMPLOYEE_AVSC);
+        schemaRegistryUtil.addTable(new SchemaTableName(SCHEMA, "stream2"), EMPLOYEE_AVSC);
+        schemaRegistryUtil.addTable(new SchemaTableName(SCHEMA, "stream3"), EMPLOYEE_AVSC);
 
         PravegaStreamDescription table =
                 tableSupplier.getTable(new SchemaTableName(SCHEMA, "multiexplicit"));

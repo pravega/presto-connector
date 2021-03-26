@@ -17,25 +17,15 @@ package io.pravega.connectors.presto.schemamanagement;
 
 import com.facebook.presto.common.type.VarcharType;
 import com.facebook.presto.spi.SchemaTableName;
-import com.google.common.collect.ImmutableMap;
-import io.pravega.client.admin.StreamManager;
 import io.pravega.connectors.presto.PravegaStreamDescription;
 import io.pravega.connectors.presto.PravegaStreamFieldDescription;
 import io.pravega.connectors.presto.PravegaStreamFieldGroup;
 import io.pravega.connectors.presto.PravegaTableHandle;
-import io.pravega.connectors.presto.util.MockSchemaRegistryClient;
-import io.pravega.connectors.presto.util.MockStreamManager;
-import io.pravega.connectors.presto.util.PravegaNameUtils;
-import io.pravega.schemaregistry.client.SchemaRegistryClient;
-import io.pravega.schemaregistry.contract.data.Compatibility;
-import io.pravega.schemaregistry.contract.data.GroupProperties;
-import io.pravega.schemaregistry.contract.data.SerializationFormat;
-import io.pravega.schemaregistry.serializer.avro.schemas.AvroSchema;
+import io.pravega.connectors.presto.util.SchemaRegistryUtil;
 import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static io.pravega.connectors.presto.util.PravegaTestUtils.avroSchema;
 import static io.pravega.connectors.presto.util.TestSchemas.EMPLOYEE_AVSC;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -47,14 +37,12 @@ public class PravegaSchemaRegistryTest
     @Test
     public void testListSchemas()
     {
-        StreamManager streamManager = new MockStreamManager();
+        SchemaRegistryUtil schemaRegistryUtil = new SchemaRegistryUtil();
 
-        streamManager.createScope("schema1");
-        streamManager.createScope("schema2");
+        schemaRegistryUtil.addSchema("schema1");
+        schemaRegistryUtil.addSchema("schema2");
 
-        PravegaSchemaRegistry schemaRegistry = new PravegaSchemaRegistry(new MockSchemaRegistryClient(), streamManager);
-
-        List<String> schemas = schemaRegistry.listSchemas();
+        List<String> schemas = schemaRegistryUtil.getSchemaRegistry().listSchemas();
         assertEquals(schemas.size(), 2);
         assertEquals("schema1", schemas.get(0));
         assertEquals("schema2", schemas.get(1));
@@ -63,15 +51,14 @@ public class PravegaSchemaRegistryTest
     @Test
     public void testListTables()
     {
-        StreamManager streamManager = new MockStreamManager();
+        SchemaRegistryUtil schemaRegistryUtil = new SchemaRegistryUtil();
 
-        streamManager.createStream("schema1", "stream1", null);
-        streamManager.createStream("schema2", "stream2", null);
+        schemaRegistryUtil.addTable("schema1", "stream1");
+        schemaRegistryUtil.addTable("schema2", "stream2");
         // stream starting with '_' is internal/hidden
-        streamManager.createStream("schema2", "_markStream2", null);
+        schemaRegistryUtil.addTable("schema2", "_markStream2");
 
-        PravegaSchemaRegistry schemaRegistry = new PravegaSchemaRegistry(new MockSchemaRegistryClient(), streamManager);
-        List<PravegaTableHandle> tables = schemaRegistry.listTables("schema2");
+        List<PravegaTableHandle> tables = schemaRegistryUtil.getSchemaRegistry().listTables("schema2");
         assertEquals(tables.size(), 1);
         assertEquals("stream2", tables.get(0).getObjectName());
     }
@@ -79,14 +66,12 @@ public class PravegaSchemaRegistryTest
     @Test
     public void testGetTable()
     {
+        SchemaRegistryUtil schemaRegistryUtil = new SchemaRegistryUtil();
+
         SchemaTableName schemaTableName = new SchemaTableName("hr", "employee");
+        schemaRegistryUtil.addAvroSchema(schemaTableName, EMPLOYEE_AVSC);
 
-        SchemaRegistryClient schemaRegistryClient = new MockSchemaRegistryClient();
-        schemaRegistryClient.addGroup(groupId(schemaTableName), groupProperties(false));
-        schemaRegistryClient.addSchema(groupId(schemaTableName), AvroSchema.of(avroSchema(EMPLOYEE_AVSC)).getSchemaInfo());
-
-
-        PravegaSchemaRegistry schemaRegistry = new PravegaSchemaRegistry(schemaRegistryClient, new MockStreamManager());
+        SchemaRegistry schemaRegistry = schemaRegistryUtil.getSchemaRegistry();
 
         PravegaStreamDescription table = schemaRegistry.getTable(schemaTableName);
 
@@ -104,19 +89,5 @@ public class PravegaSchemaRegistryTest
         field = fieldGroup.getFields().get(1);
         assertEquals(field.getName(), "last");
         assertTrue(field.getType() instanceof VarcharType);
-    }
-
-    private static GroupProperties groupProperties(boolean inline)
-    {
-        return new GroupProperties(
-                SerializationFormat.Avro,
-                Compatibility.allowAny(),
-                false,
-                ImmutableMap.<String, String>builder().put(inline ? "inline" : "", "").build());
-    }
-
-    private static String groupId(SchemaTableName schemaTableName)
-    {
-        return PravegaNameUtils.groupId(schemaTableName.getSchemaName(), schemaTableName.getTableName());
     }
 }
