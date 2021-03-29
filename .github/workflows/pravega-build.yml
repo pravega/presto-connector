@@ -34,7 +34,8 @@ jobs:
         with:
           path: ${{env.BUILD_CACHE_PATH}}
           key: ${{github.run_id}}
-          run: ./gradlew build
+      - name: Compile
+        run: ./gradlew build
 
   integration:
     name: Integration tests
