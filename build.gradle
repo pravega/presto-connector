@@ -94,6 +94,10 @@ distributions {
             from(project.configurations.runtime)
         }
     }
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 test {
