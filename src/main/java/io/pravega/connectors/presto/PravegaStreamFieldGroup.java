@@ -48,6 +48,14 @@ public class PravegaStreamFieldGroup
         this.fields = fields;
     }
 
+    public PravegaStreamFieldGroup(PravegaStreamFieldGroup fieldGroup, String dataSchema, List<PravegaStreamFieldDescription> fields)
+    {
+        this.dataFormat = fieldGroup.dataFormat;
+        this.mapping = fieldGroup.mapping;
+        this.dataSchema = Optional.of(dataSchema);
+        this.fields = Optional.of(fields);
+    }
+
     @JsonProperty
     public String getDataFormat()
     {

@@ -1,0 +1,35 @@
+{
+    "tableName": "partsupp",
+    "schemaName": "tpch",
+    "objectName": "partsupp",
+    "event": [{
+        "dataFormat": "json",
+        "fields": [
+            {
+                "name": "partkey",
+                "mapping": "partkey",
+                "type": "BIGINT"
+            },
+            {
+                "name": "suppkey",
+                "mapping": "suppkey",
+                "type": "BIGINT"
+            },
+            {
+                "name": "availqty",
+                "mapping": "availqty",
+                "type": "INTEGER"
+            },
+            {
+                "name": "supplycost",
+                "mapping": "supplycost",
+                "type": "DOUBLE"
+            },
+            {
+                "name": "comment",
+                "mapping": "comment",
+                "type": "VARCHAR(199)"
+            }
+        ]
+    }]
+}

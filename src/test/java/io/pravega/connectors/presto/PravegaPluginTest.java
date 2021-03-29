@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.pravega.connectors.presto;
 
 import com.facebook.presto.spi.connector.Connector;
 import com.facebook.presto.spi.connector.ConnectorFactory;
 import com.facebook.presto.testing.TestingConnectorContext;
 import com.google.common.collect.ImmutableMap;
+import org.testng.annotations.Test;
 
 import static com.facebook.airlift.testing.Assertions.assertInstanceOf;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static org.testng.Assert.assertNotNull;
 
-public class TestPravegaPlugin
+public class PravegaPluginTest
 {
+    @Test
     public void testSpinup()
     {
         PravegaPlugin plugin = new PravegaPlugin();
@@ -35,10 +36,10 @@ public class TestPravegaPlugin
         assertInstanceOf(factory, PravegaConnectorFactory.class);
 
         Connector c = factory.create(
-                "test-connector",
+                "pravega",
                 ImmutableMap.<String, String>builder()
-                        .put("pravega.table-names", "test")
-                        .put("pravega.nodes", "localhost:9092")
+                        .put("pravega.controller", "tcp://localhost:9090")
+                        .put("pravega.schema-registry", "http://localhost:9092")
                         .build(),
                 new TestingConnectorContext());
         assertNotNull(c);

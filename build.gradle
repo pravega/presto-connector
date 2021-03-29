@@ -36,6 +36,7 @@ dependencies {
     compile "javax.validation:validation-api:${javaxValidationVersion}"
     compile "javax.inject:javax.inject:1"
     compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+
     compile "io.pravega:pravega-client:${pravegaVersion}"
     compile "io.pravega:pravega-common:${pravegaVersion}"
     compile "io.pravega:pravega-shared-protocol:${pravegaVersion}"
@@ -64,6 +65,8 @@ dependencies {
 
     testImplementation "com.facebook.presto:presto-tests:${prestoVersion}"
     testImplementation "com.facebook.airlift:testing:${airliftTestingVersion}"
+
+    testCompile (group: 'io.pravega', name: 'pravega-standalone', version: pravegaVersion)
 
     compileOnly "io.airlift:slice:${airliftSliceVersion}"
     compileOnly "io.airlift:units:${airliftUnitsVersion}"
@@ -105,8 +108,17 @@ distributions {
     }
 }
 
+def integration = project.hasProperty("integration")
+
 test {
-    useTestNG()
+    maxHeapSize = "2048m"
+    dependsOn 'cleanTest'
+    useTestNG() {
+        suites "src/test/unit-test.xml"
+        if (integration) {
+            suites "src/test/integration-test.xml"
+        }
+    }
 }
 
 jar.dependsOn(copyDependentJars)

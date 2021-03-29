@@ -1,0 +1,8 @@
+{
+    "namespace": "io.pravega.avro",
+    "type": "record",
+    "name": "Id",
+    "fields": [
+        {"name": "id", "type": "int"}
+    ]
+}

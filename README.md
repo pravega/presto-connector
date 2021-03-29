@@ -12,7 +12,8 @@ See the [User Manual](https://prestodb.github.io/docs/current/) for Presto deplo
 To build and run the Pravega Presto connector, you must meet the following requirements:
 
 * Linux 
-* Java 8 Update 151 or higher (8u151+), 64-bit. Both Oracle JDK and OpenJDK are supported.
+* To build: Java 11+ 64-bit. Both Oracle JDK and OpenJDK are supported (we build using Java 11 JDK but with Java 8 compatibility)
+* To run: Java 8 Update 151 or higher (8u151+), 64-bit. Both Oracle JDK and OpenJDK are supported. 
 * Gradle 6.5.1+ (for building)
 * Python 2.7+ (for running with the launcher script)
 * Pravega version 0.9.0 or higher
@@ -46,7 +47,10 @@ Make a directory for the Presto configuration files
 
     [root@lrmk226 ~]# mkdir $PRESTO_HOME/etc
     
-Now follow the directions to create the neccesary configuration files for configuring Presto found in the PrestoDB documentation.
+Now follow the directions to create the necessary configuration files for configuring Presto found in the PrestoDB documentation.
+
+Note that if you are also running with Java 11, you may have to add the following to your etc/jvm.config
+-Djdk.attach.allowAttachSelf=true
 
 ## Installing and Configuring Pravega Connector
 
@@ -74,7 +78,7 @@ After building Presto for the first time, you can load the project into your IDE
 After opening the project in IntelliJ, double check that the Java SDK is properly configured for the project:
 
 * Open the File menu and select Project Structure
-* In the SDKs section, ensure that a 1.8 JDK is selected (create one if none exist)
+* In the SDKs section, ensure that a Java 11+ JDK is selected (create one if none exist)
 * In the Project section, ensure the Project language level is set to 8.0 as Presto makes use of several Java 8 language features
 
 Use the following options to create a run configuration that runs the Presto server using the Pravega Presto connector:
@@ -85,7 +89,10 @@ Use the following options to create a run configuration that runs the Presto ser
 * Use classpath of module: 'pravega.main'
 * Add a 'Before Launch' task - Add a gradle task to run the 'jar' task for the 'presto-connector' Gradle project.
 
+Please note that some versions of Intellij do not display VM Options by default.  For this, enable them with 'Modify options'
+
 Modify the pravega.properties file in etc/catalog as previously described to point to a running Pravega controller, and a running Schema Registry.
+
 
 ## Schema Definitions
 
@@ -142,3 +149,11 @@ Currently, you must manually create schema definitions using a JSON file. In fut
         }]
     }
 
+## Tests
+The pravega presto connector has 2 types of tests
+* unit tests
+  * all unit tests run during developer builds
+* integration tests
+    * by default only run on CI server
+    * use '-Pintegration' flag to run:  ./gradlew test -Pintegration
+    

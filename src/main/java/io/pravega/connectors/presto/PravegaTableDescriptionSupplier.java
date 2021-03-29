@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.pravega.connectors.presto;
 
 import com.facebook.airlift.json.JsonCodec;
 import com.facebook.airlift.log.Logger;
-import com.facebook.presto.common.type.Type;
 import com.facebook.presto.spi.SchemaTableName;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
-import com.google.protobuf.Descriptors;
 import io.pravega.client.ClientConfig;
 import io.pravega.client.admin.StreamManager;
 import io.pravega.client.stream.Stream;
@@ -35,12 +33,6 @@ import io.pravega.schemaregistry.client.SchemaRegistryClientFactory;
 import io.pravega.schemaregistry.contract.data.GroupProperties;
 import io.pravega.schemaregistry.contract.data.SchemaWithVersion;
 import io.pravega.schemaregistry.contract.data.SerializationFormat;
-import io.pravega.schemaregistry.serializer.json.schemas.JSONSchema;
-import org.everit.json.schema.BooleanSchema;
-import org.everit.json.schema.NumberSchema;
-import org.everit.json.schema.ObjectSchema;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.StringSchema;
 
 import javax.inject.Inject;
 
@@ -55,15 +47,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.facebook.presto.common.type.BigintType.BIGINT;
-import static com.facebook.presto.common.type.BooleanType.BOOLEAN;
-import static com.facebook.presto.common.type.DoubleType.DOUBLE;
-import static com.facebook.presto.common.type.VarbinaryType.VARBINARY;
-import static com.facebook.presto.common.type.VarcharType.createUnboundedVarcharType;
 import static io.pravega.connectors.presto.ProtobufCommon.encodeSchema;
 import static io.pravega.connectors.presto.util.PravegaNameUtils.groupId;
 import static io.pravega.connectors.presto.util.PravegaNameUtils.kvFieldMapping;
@@ -71,17 +57,15 @@ import static io.pravega.connectors.presto.util.PravegaNameUtils.kvTable;
 import static io.pravega.connectors.presto.util.PravegaNameUtils.multiSourceStream;
 import static io.pravega.connectors.presto.util.PravegaNameUtils.temp_streamNameToTableName;
 import static io.pravega.connectors.presto.util.PravegaNameUtils.temp_tableNameToStreamName;
-import static io.pravega.connectors.presto.util.PravegaSchemaUtils.AVRO;
 import static io.pravega.connectors.presto.util.PravegaSchemaUtils.GROUP_PROPERTIES_INLINE_KEY;
 import static io.pravega.connectors.presto.util.PravegaSchemaUtils.GROUP_PROPERTIES_INLINE_KV_KEY;
 import static io.pravega.connectors.presto.util.PravegaSchemaUtils.GROUP_PROPERTIES_INLINE_KV_VALUE;
 import static io.pravega.connectors.presto.util.PravegaSchemaUtils.INLINE_SUFFIX;
-import static io.pravega.connectors.presto.util.PravegaSchemaUtils.NESTED_RECORD_SEPARATOR;
 import static io.pravega.connectors.presto.util.PravegaSchemaUtils.readSchema;
+import static io.pravega.connectors.presto.util.PravegaStreamDescUtils.mapFieldsFromSchema;
 import static java.nio.file.Files.readAllBytes;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
-import static org.apache.avro.Schema.Type.RECORD;
 
 // pravega scope is a namespace for streams.  stream is unique within scope.
 // presto schema is like a database, with collection of tables.
@@ -128,6 +112,16 @@ public class PravegaTableDescriptionSupplier
         this.tableCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(pravegaConnectorConfig.getTableCacheExpireSecs(), TimeUnit.SECONDS)
                 .build();
+    }
+
+    @VisibleForTesting
+    public PravegaTableDescriptionSupplier(PravegaConnectorConfig pravegaConnectorConfig,
+                                           Cache<String, Object> schemaCache,
+                                           Cache<PravegaTableName, Optional<PravegaStreamDescription>> tableCache)
+    {
+        this.pravegaConnectorConfig = pravegaConnectorConfig;
+        this.schemaCache = schemaCache;
+        this.tableCache = tableCache;
     }
 
     public List<String> listSchemas()
@@ -341,6 +335,12 @@ public class PravegaTableDescriptionSupplier
         return table;
     }
 
+    /**
+     * construct PravegaStreamFieldGroup by looking up schema in schema registry
+     *
+     * @param schemaTableName
+     * @return
+     */
     private Optional<List<PravegaStreamFieldGroup>> fieldGroupsFromSchemaRegistry(final SchemaTableName schemaTableName)
     {
         log.info("look up description of '%s' from pravega", schemaTableName);
@@ -356,19 +356,19 @@ public class PravegaTableDescriptionSupplier
         GroupProperties properties =
                 registryClient.getGroupProperties(groupName);
 
-        List<SchemaWithVersion> schemas =
-                registryClient.getSchemas(groupName);
+        List<SchemaWithVersion> schemas = registryClient.getSchemas(groupName);
         if (schemas.size() == 0 || schemas.size() > 2) {
             throw new IllegalStateException(schemaTableName + " has " + schemas.size() + " registered schemas.  expecting either 1 or 2");
         }
 
-        for (int i = 0; i < schemas.size(); i++) {
-            SerializationFormat format = schemas.get(i).getSchemaInfo().getSerializationFormat();
+        // kv table will have > 1 schema.  key+value likely different types
+        boolean kv = schemas.size() > 1;
 
-            // kv table will have > 1 schema.  key+value likely different types
+        for (int i = 0; i < schemas.size(); i++) {
             // colPrefix used for display so can differentiate between fields from key or value
-            boolean kv = schemas.size() > 1;
             String colPrefix = kv ? kvFieldMapping(i) : "";
+
+            SerializationFormat format = schemas.get(i).getSchemaInfo().getSerializationFormat();
             fieldGroups.add(new PravegaStreamFieldGroup(
                     dataFormat(properties.getProperties(), format, kv, i),
                     Optional.of(colPrefix),
@@ -473,291 +473,6 @@ public class PravegaTableDescriptionSupplier
                 ? format.getFullTypeName().toLowerCase(Locale.ENGLISH)
                 : format.name().toLowerCase(Locale.ENGLISH);
         return finalFormat + (groupProperties.containsKey(key) ? INLINE_SUFFIX : "");
-    }
-
-    /**
-     * map protobuf java type -> presto sql type
-     *
-     * @param fieldDescriptor
-     * @return
-     */
-    private static Type typeFromSchema(Descriptors.FieldDescriptor fieldDescriptor)
-    {
-        switch (fieldDescriptor.getJavaType()) {
-            case STRING:
-                return createUnboundedVarcharType();
-
-            case INT:
-            case LONG:
-                return BIGINT;
-
-            case FLOAT:
-            case DOUBLE:
-                return DOUBLE;
-
-            case BOOLEAN:
-                return BOOLEAN;
-
-            case BYTE_STRING:
-                return VARBINARY;
-
-            default:
-                throw new RuntimeException("unsupported type " + fieldDescriptor);
-        }
-    }
-
-    /**
-     * map json schema type -> presto sql type
-     *
-     * @param schema
-     * @return
-     */
-    private static Type typeFromSchema(Schema schema)
-    {
-        if (schema instanceof NumberSchema) {
-            return ((NumberSchema) schema).requiresInteger()
-                    ? BIGINT
-                    : DOUBLE;
-        }
-        else if (schema instanceof BooleanSchema) {
-            return BOOLEAN;
-        }
-        else if (schema instanceof StringSchema) {
-            return createUnboundedVarcharType();
-        }
-        else {
-            throw new RuntimeException("unsupported schema " + schema);
-        }
-    }
-
-    /**
-     * map avro schema type to presto sql type
-     *
-     * @param schema
-     * @return
-     */
-    private static Type typeFromSchema(org.apache.avro.Schema schema)
-    {
-        // refer to AvroColumnDecoder#isSupportedType
-
-        switch (schema.getType()) {
-            case FIXED:
-            case STRING:
-                return createUnboundedVarcharType();
-
-            case INT:
-            case LONG:
-                return BIGINT;
-
-            case FLOAT:
-            case DOUBLE:
-                return DOUBLE;
-
-            case BOOLEAN:
-                return BOOLEAN;
-
-            case BYTES:
-                return VARBINARY;
-
-            case MAP:
-            case ARRAY:
-                // TODO: ^^ handle these https://github.com/pravega/pravega-sql/issues/65
-
-            case RECORD:
-            case ENUM:
-            case UNION:
-            default:
-                throw new RuntimeException("unexpected type " + schema);
-        }
-    }
-
-    /**
-     * return lists of common field definitions
-     * uses list of fields from provided schema; schema is different depending on serialization format
-     *
-     * @param format
-     * @param schemaWithVersion
-     * @return
-     */
-    private static List<PravegaStreamFieldDescription> mapFieldsFromSchema(
-            String namePrefix,
-            SerializationFormat format,
-            SchemaWithVersion schemaWithVersion)
-    {
-        switch (format) {
-            case Json:
-                ObjectSchema objectSchema =
-                        (ObjectSchema) JSONSchema.from(schemaWithVersion.getSchemaInfo()).getSchema();
-                return mapTable(namePrefix, new JsonSchema(objectSchema));
-
-            case Avro:
-            case Custom: // re: Custom - definition for schema itself Custom is always Avro (only custom impl. is csv)
-                org.apache.avro.Schema schema =
-                        new org.apache.avro.Schema.Parser().parse(
-                                new String(schemaWithVersion.getSchemaInfo().getSchemaData().array(), StandardCharsets.UTF_8));
-                return mapTable(namePrefix, new AvroSchema(schema, format == SerializationFormat.Custom));
-
-            case Protobuf:
-                return mapTable(namePrefix, new ProtobufSchema(ProtobufCommon.descriptorFor(schemaWithVersion)));
-
-            default:
-                throw new IllegalArgumentException("unexpected format " + format);
-        }
-    }
-
-    private static List<PravegaStreamFieldDescription> mapFieldsFromSchema(String namePrefix, String format, String schemaString)
-    {
-        // schemaString defined as human-readable string in local file.  only avro supported now.
-        switch (format) {
-            case AVRO:
-                org.apache.avro.Schema schema =
-                        new org.apache.avro.Schema.Parser().parse(schemaString);
-                return mapTable(namePrefix, new AvroSchema(schema, false));
-
-            default:
-                throw new UnsupportedOperationException("unexpected format " + format);
-        }
-    }
-
-    private static class SchemaColumn
-    {
-        String name;
-        String mapping;
-        Type type;
-
-        SchemaColumn(String name, String mapping, Type type)
-        {
-            this.name = name;
-            this.mapping = mapping;
-            this.type = type;
-        }
-    }
-
-    static class SchemaWrapper
-    {
-        List<SchemaField> fields = new ArrayList<>();
-    }
-
-    static class SchemaField
-    {
-        String name;
-        Type type;
-        boolean record;
-        SchemaWrapper schema;
-        int ordinalPosition;
-
-        SchemaField(String name, Type type, boolean record, SchemaWrapper schema)
-        {
-            this(name, type, record, schema, -1);
-        }
-
-        SchemaField(String name, Type type, boolean record, SchemaWrapper schema, int ordinalPosition)
-        {
-            this.name = name;
-            this.type = type;
-            this.record = record;
-            this.schema = schema;
-            this.ordinalPosition = ordinalPosition;
-        }
-    }
-
-    static class JsonSchema
-            extends SchemaWrapper
-    {
-        JsonSchema(ObjectSchema schema)
-        {
-            schema.getPropertySchemas().forEach((key, value) -> {
-                boolean record = value instanceof ObjectSchema;
-                fields.add(new SchemaField(key,
-                        record ? null : typeFromSchema(value),
-                        record,
-                        record ? new JsonSchema((ObjectSchema) value) : null));
-            });
-        }
-    }
-
-    static class ProtobufSchema
-            extends SchemaWrapper
-    {
-        ProtobufSchema(Descriptors.Descriptor schema)
-        {
-            schema.getFields().forEach(f -> {
-                boolean record = f.getJavaType() == Descriptors.FieldDescriptor.JavaType.MESSAGE;
-                fields.add(new SchemaField(f.getJsonName(),
-                        record ? null : typeFromSchema(f),
-                        record,
-                        record ? new ProtobufSchema(f.getMessageType()) : null));
-            });
-        }
-    }
-
-    static class AvroSchema
-            extends SchemaWrapper
-    {
-        AvroSchema(org.apache.avro.Schema schema, boolean customCsv)
-        {
-            final AtomicInteger position = new AtomicInteger();
-            schema.getFields().forEach(f -> {
-                boolean record = f.schema().getType() == RECORD;
-                fields.add(new SchemaField(f.name(),
-                        record ? null : typeFromSchema(f.schema()),
-                        record,
-                        record ? new AvroSchema(f.schema(), customCsv) : null,
-                        customCsv ? position.getAndIncrement() : -1));
-            });
-        }
-    }
-
-    private static List<PravegaStreamFieldDescription> mapTable(String namePrefix, SchemaWrapper schema)
-    {
-        return mapFieldsFromSchema(mapColumns(namePrefix, null /* mappingPrefix */, schema));
-    }
-
-    private static List<SchemaColumn> mapColumns(String namePrefix, String mappingPrefix, SchemaWrapper schema)
-    {
-        List<SchemaColumn> columnList = new ArrayList<>();
-        schema.fields.forEach(field -> {
-            String name = nestedPrefixFor(namePrefix, field.name);
-            // for csv we use only position.  for avro, json, etc, can be path into nested object
-            String mapping = field.ordinalPosition >= 0
-                    ? String.valueOf(field.ordinalPosition)
-                    : nestedPrefixFor(mappingPrefix, field.name);
-            if (field.record) {
-                columnList.addAll(mapColumns(name, mapping, field.schema));
-            }
-            else {
-                columnList.add(new SchemaColumn(name, mapping, field.type));
-            }
-        });
-        return columnList;
-    }
-
-    private static String nestedPrefixFor(String prefix, String name)
-    {
-        // (record1, field1) -> record1/field1
-        return prefix == null || prefix.isEmpty()
-                ? name
-                : prefix + NESTED_RECORD_SEPARATOR + name;
-    }
-
-    /**
-     * create field description from list of name,mapping,type tuples.  each pair is a field in the schema.
-     * @param schemaColumns
-     * @return
-     */
-    static List<PravegaStreamFieldDescription> mapFieldsFromSchema(List<SchemaColumn> schemaColumns)
-    {
-        List<PravegaStreamFieldDescription> fields = new ArrayList<>();
-        schemaColumns.forEach(sc -> {
-            fields.add(new PravegaStreamFieldDescription(sc.name,
-                    sc.type,
-                    sc.mapping,
-                    "",
-                    null,
-                    null,
-                    false));
-        });
-        return fields;
     }
 
     private static Optional<String> dataSchema(SerializationFormat format, SchemaWithVersion schemaWithVersion)
