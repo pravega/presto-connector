@@ -19,13 +19,16 @@ import com.facebook.airlift.log.Logger;
 import com.facebook.airlift.log.Logging;
 import com.facebook.presto.Session;
 import com.facebook.presto.common.QualifiedObjectName;
+
 import com.facebook.presto.testing.QueryRunner;
 import com.facebook.presto.tests.DistributedQueryRunner;
 import com.facebook.presto.tests.TestingPrestoClient;
 import com.facebook.presto.tpch.TpchPlugin;
+
 import com.google.common.collect.ImmutableMap;
 import io.airlift.tpch.TpchTable;
 import io.pravega.client.admin.StreamManager;
+
 import io.pravega.connectors.presto.PravegaPlugin;
 import io.pravega.connectors.presto.PravegaTableDescriptionSupplier;
 import io.pravega.connectors.presto.schemamanagement.CompositeSchemaRegistry;

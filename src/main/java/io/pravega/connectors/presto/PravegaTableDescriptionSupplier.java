@@ -131,6 +131,7 @@ public class PravegaTableDescriptionSupplier
 
                 schemaRegistry.listTables(s).forEach(table -> {
 
+                    // we hide component streams (components of multi-source streams) from view
                     boolean hidden =
                             compositeStreams.stream().anyMatch(p -> p.matcher(table.getTableName()).matches());
 
@@ -229,8 +230,8 @@ public class PravegaTableDescriptionSupplier
             if (fieldGroup.getFields() == null) {
                 return false;
             }
-        }
 
+        }
         return true;
     }
 }

@@ -52,6 +52,8 @@ public class LocalSchemaRegistry
     {
         // file name format: {schema}.{table}.json
         return localSchemaStream()
+                // ensures matches full file name format
+                .filter(file -> file.getName().split("\\.").length == 3)
                 .map(file -> file.getName().split("\\.")[0])
                 .distinct()
                 .collect(Collectors.toList());
