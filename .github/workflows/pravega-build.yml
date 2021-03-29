@@ -42,10 +42,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build Output Cache
-      uses: actions/cache@v2.1.0
-      with:
-        path: ${{env.BUILD_CACHE_PATH}}
-        key: ${{github.run_id}}
+        uses: actions/cache@v2.1.0
+        with:
+          path: ${{env.BUILD_CACHE_PATH}}
+          key: ${{github.run_id}}
       - name: Integration Tests
         run: ./gradlew -Pintegration test
 
