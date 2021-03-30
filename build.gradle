@@ -106,6 +106,10 @@ distributions {
             from jar
         }
     }
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 def integration = project.hasProperty("integration")
