@@ -112,7 +112,6 @@ def integration = project.hasProperty("integration")
 
 test {
     maxHeapSize = "2048m"
-    dependsOn 'cleanTest'
     useTestNG() {
         suites "src/test/unit-test.xml"
         if (integration) {
