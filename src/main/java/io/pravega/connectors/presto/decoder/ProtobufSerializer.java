@@ -21,7 +21,6 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import io.pravega.client.stream.Serializer;
 import io.pravega.schemaregistry.serializer.shared.impl.SerializerConfig;
-import io.pravega.schemaregistry.serializers.SerializerFactory;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
@@ -33,48 +32,40 @@ import static io.pravega.connectors.presto.ProtobufCommon.descriptorFor;
 
 // deserialize using externally provided schema or using SR+SerializerConfig
 public class ProtobufSerializer
-        extends KVSerializer<DynamicMessage>
-{
+        extends KVSerializer<DynamicMessage> {
     private static class DynamicMessageSerializer
-            implements Serializer<Object>
-    {
+            implements Serializer<Object> {
         private final Descriptors.Descriptor descriptor;
 
-        DynamicMessageSerializer(Descriptors.Descriptor descriptor)
-        {
+        DynamicMessageSerializer(Descriptors.Descriptor descriptor) {
             this.descriptor = descriptor;
         }
 
         @Override
-        public ByteBuffer serialize(Object value)
-        {
+        public ByteBuffer serialize(Object value) {
             return ByteBuffer.wrap(((DynamicMessage) value).toByteArray());
         }
 
         @Override
-        public DynamicMessage deserialize(ByteBuffer serializedValue)
-        {
+        public DynamicMessage deserialize(ByteBuffer serializedValue) {
             try {
                 return DynamicMessage.parseFrom(descriptor,
                         new ByteBufferInputStream(serializedValue));
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
         }
     }
 
-    private final Serializer<Object> delegate;
-
-    public ProtobufSerializer(SerializerConfig config)
-    {
-        this.delegate = SerializerFactory.genericDeserializer(config);
+    public ProtobufSerializer(SerializerConfig config, String schema) {
+        super(config, schema);
     }
 
-    public ProtobufSerializer(String encodedSchema)
+    @Override
+    public Serializer<Object> serializerForSchema(String schema)
     {
-        Pair<String, ByteBuffer> pair = decodeSchema(encodedSchema);
-        this.delegate = new DynamicMessageSerializer(descriptorFor(pair.getLeft(), pair.getRight()));
+        Pair<String, ByteBuffer> pair = decodeSchema(schema);
+        return new DynamicMessageSerializer(descriptorFor(pair.getLeft(), pair.getRight()));
     }
 
     @Override
@@ -86,7 +77,7 @@ public class ProtobufSerializer
     @Override
     public DynamicMessage deserialize(ByteBuffer serializedValue)
     {
-        return (DynamicMessage) delegate.deserialize(serializedValue);
+        return super.deserialize(serializedValue);
     }
 
     @Override

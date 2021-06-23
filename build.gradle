@@ -67,6 +67,7 @@ dependencies {
     testImplementation "com.facebook.airlift:testing:${airliftTestingVersion}"
 
     testCompile (group: 'io.pravega', name: 'pravega-standalone', version: pravegaVersion)
+    testCompile "io.pravega:schemaregistry-server:${pravegaSchemaRegistryVersion}"
 
     compileOnly "io.airlift:slice:${airliftSliceVersion}"
     compileOnly "io.airlift:units:${airliftUnitsVersion}"
