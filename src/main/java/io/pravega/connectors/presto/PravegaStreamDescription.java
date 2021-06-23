@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.pravega.connectors.presto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -64,6 +63,16 @@ public class PravegaStreamDescription
         this.objectName = streamDescription.objectName;
         this.objectType = streamDescription.objectType;
         this.objectArgs = streamDescription.objectArgs;
+        this.event = Optional.of(event);
+    }
+
+    public PravegaStreamDescription(PravegaStreamDescription streamDescription, List<PravegaStreamFieldGroup> event, List<String> objectArgs)
+    {
+        this.tableName = streamDescription.tableName;
+        this.schemaName = streamDescription.schemaName;
+        this.objectName = streamDescription.objectName;
+        this.objectType = streamDescription.objectType;
+        this.objectArgs = Optional.of(objectArgs);
         this.event = Optional.of(event);
     }
 

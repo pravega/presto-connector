@@ -104,8 +104,7 @@ public class PravegaMetadata
             return null;
         }
 
-        return new PravegaTableHandle(connectorId,
-                schemaTableName.getSchemaName(),
+        return new PravegaTableHandle(schemaTableName.getSchemaName(),
                 schemaTableName.getTableName(),
                 table.getObjectName(),
                 table.getObjectType(),

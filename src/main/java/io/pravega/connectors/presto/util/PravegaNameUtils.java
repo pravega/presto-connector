@@ -16,6 +16,7 @@
 
 package io.pravega.connectors.presto.util;
 
+import io.pravega.client.stream.Stream;
 import io.pravega.connectors.presto.ObjectType;
 import io.pravega.connectors.presto.PravegaStreamDescription;
 import io.pravega.connectors.presto.PravegaTableHandle;
@@ -51,20 +52,24 @@ public class PravegaNameUtils
         return scope + "." + stream;
     }
 
-    // test stream name - if not valid pravega stream name assume it is regex for multi source
     public static boolean multiSourceStream(PravegaStreamDescription object)
     {
+        // if stream name is a regex, or if there are object args
+        // (objectArgs for stream are comma sep list of component streams)
         return object.getObjectType() == ObjectType.STREAM &&
-                multiSourceStream(object.getObjectName());
+                (multiSourceStream(object.getObjectName()) || object.getObjectArgs().isPresent());
     }
 
     public static boolean multiSourceStream(PravegaTableHandle object)
     {
+        // if stream name is a regex, or if there are object args
+        // (objectArgs for stream are comma sep list of component streams)
         return object.getObjectType() == ObjectType.STREAM &&
-                multiSourceStream(object.getObjectName());
+                (multiSourceStream(object.getObjectName()) || object.getObjectArgs().isPresent());
     }
 
-    private static boolean multiSourceStream(String stream)
+    // test stream name - if not valid pravega stream name assume it is regex for multi source
+    public static boolean multiSourceStream(String stream)
     {
         try {
             // test pattern for stream names pravega will allow
@@ -107,5 +112,16 @@ public class PravegaNameUtils
     public static String streamCutName(String stream)
     {
         return stream + STREAM_CUT_PREFIX;
+    }
+
+    public static boolean internalStream(Stream stream)
+    {
+        return internalObject(stream.getStreamName());
+    }
+
+    public static boolean internalObject(String object)
+    {
+        return object.startsWith("_") /* pravega internal */ ||
+                object.endsWith("-SC") /* application internal - stream cuts */;
     }
 }

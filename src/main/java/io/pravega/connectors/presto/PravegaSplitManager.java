@@ -116,10 +116,10 @@ public class PravegaSplitManager
 
     private void buildKVSplits(PravegaTableHandle pravegaTableHandle, ImmutableList.Builder<ConnectorSplit> splits)
     {
-        pravegaTableHandle.getOjectArgs().orElseThrow(() ->
+        pravegaTableHandle.getObjectArgs().orElseThrow(() ->
                 new IllegalArgumentException("no KF defined for " + pravegaTableHandle));
 
-        for (String kf : pravegaTableHandle.getOjectArgs().get()) {
+        for (String kf : pravegaTableHandle.getObjectArgs().get()) {
             PravegaSplit split =
                     new PravegaSplit(connectorId,
                             ObjectType.KV_TABLE,
@@ -130,7 +130,7 @@ public class PravegaSplitManager
             splits.add(split);
         }
 
-        log.info("created " + pravegaTableHandle.getOjectArgs().get().size() + " kv splits");
+        log.info("created " + pravegaTableHandle.getObjectArgs().get().size() + " kv splits");
     }
 
     private void buildStreamSplits(final PravegaProperties properties,
@@ -139,7 +139,7 @@ public class PravegaSplitManager
     {
         // TODO: Enable begin and end cuts to be configurable: https://github.com/pravega/pravega-sql/issues/24
         List<String> sourceStreams = multiSourceStream(pravegaTableHandle)
-                ? pravegaTableHandle.getOjectArgs().orElseThrow(
+                ? pravegaTableHandle.getObjectArgs().orElseThrow(
                         () -> new IllegalArgumentException("no args for multi source table found"))
                 : Collections.singletonList(pravegaTableHandle.getObjectName());
 
