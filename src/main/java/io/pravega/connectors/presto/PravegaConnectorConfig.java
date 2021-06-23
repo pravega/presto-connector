@@ -51,8 +51,6 @@ public class PravegaConnectorConfig
     private File tableDescriptionDir = new File("etc/pravega/");
 
 
-    private URI confluentSchemaRegistry;
-
     @NotNull
     public URI getControllerURI()
     {
@@ -107,17 +105,5 @@ public class PravegaConnectorConfig
     {
         this.hideInternalColumns = hideInternalColumns;
         return this;
-    }
-
-    @Config("pravega.confluentSchemaRegistry")
-    public PravegaConnectorConfig setConfluentSchemaRegistry(URI confluentSchemaRegistry)
-    {
-        this.confluentSchemaRegistry = confluentSchemaRegistry;
-        return this;
-    }
-
-    public URI getConfluentSchemaRegistry()
-    {
-        return confluentSchemaRegistry;
     }
 }

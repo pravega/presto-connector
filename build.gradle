@@ -24,10 +24,6 @@ repositories {
     maven {
         url = uri('https://repo.maven.apache.org/maven2')
     }
-
-    maven {
-        url = uri('https://packages.confluent.io/maven/')
-    }
 }
 
 dependencies {
@@ -59,8 +55,6 @@ dependencies {
     compile "com.facebook.presto:presto-record-decoder:${prestoVersion}"
     compile "com.facebook.presto:presto-spi:${prestoVersion}"
     compile "com.facebook.presto:presto-common:${prestoVersion}"
-
-    compile "io.confluent:kafka-schema-registry-client:${confluentVersion}"
     
     compile group: 'io.netty', name: 'netty-all', version:"{nettyVersion}"
 

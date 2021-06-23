@@ -52,12 +52,6 @@ public class CompositeSchemaRegistry
             schemaSuppliers.add(schemaRegistry);
             schemaRegistries.add(schemaRegistry);
         }
-
-        if (config.getConfluentSchemaRegistry() != null) {
-            ConfluentSchemaRegistry schemaRegistry =
-                    new ConfluentSchemaRegistry(config.getConfluentSchemaRegistry());
-            schemaRegistries.add(schemaRegistry);
-        }
     }
 
     @VisibleForTesting
