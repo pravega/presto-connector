@@ -25,5 +25,5 @@ benchmark_outputs
 .checkstyle
 .editorconfig
 node_modules
-schema_registry.log
-schema_registry.*gz
+schema-registry.log
+schema_registry_*.gz
