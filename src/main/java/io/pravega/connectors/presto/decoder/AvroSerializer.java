@@ -16,10 +16,9 @@
 
 package io.pravega.connectors.presto.decoder;
 
-import com.facebook.airlift.log.Logger;
 import io.pravega.connectors.presto.util.ByteBufferInputStream;
-import com.google.protobuf.DynamicMessage;
 import io.pravega.client.stream.Serializer;
+import io.pravega.connectors.presto.util.PravegaSerializationUtils;
 import io.pravega.schemaregistry.serializer.shared.impl.SerializerConfig;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileStream;
@@ -34,7 +33,6 @@ import java.nio.ByteBuffer;
 // deserialize using externally provided schema or using SR+SerializerConfig
 public class AvroSerializer
         extends KVSerializer<GenericRecord> {
-    private static final Logger log = Logger.get(AvroSerializer.class);
 
     private static class GenericRecordSerializer
             implements Serializer<Object> {
@@ -48,8 +46,9 @@ public class AvroSerializer
         }
 
         @Override
-        public ByteBuffer serialize(Object value) {
-            return ByteBuffer.wrap(((DynamicMessage) value).toByteArray());
+        public ByteBuffer serialize(Object object)
+        {
+            return PravegaSerializationUtils.serialize((GenericRecord) object);
         }
 
         @Override

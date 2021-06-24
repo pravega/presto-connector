@@ -1,0 +1,7 @@
+syntax = "proto3";
+package io.pravega.protobuf;
+
+message Product {
+  int32 id = 1;
+  string name = 2;
+}

@@ -6,9 +6,18 @@ plugins {
     id 'java'
     id 'distribution'
     id 'maven'
+    id 'com.commercehub.gradle.plugin.avro' version "0.99.99"
+    id 'com.google.protobuf' version "0.8.16"
 }
 
+apply plugin: 'java'
 apply from: "$rootDir/gradle/checkstyle.gradle"
+
+apply plugin: 'com.google.protobuf'
+sourceSets.main.java.srcDirs += 'build/generated/source/proto/test/java/'
+
+apply plugin: "com.commercehub.gradle.plugin.avro"
+sourceSets.main.java.srcDirs += 'build/generated-test-avro-java/'
 
 repositories {
     mavenLocal()
