@@ -9,7 +9,7 @@
  *
  * Note: this class is based on SetupUtils from pravega/flink-connectors
  * (rev 9332ad67e520c03c7122de1d3b90c6cafbf97634)
- * https://github.com/pravega/flink-connectors/blob/v0.9.0/src/test/java/io/pravega/connectors/flink/utils/SetupUtils.java
+ * https://github.com/pravega/flink-connectors/blob/v0.9.0/src/test/java/io/pravega/connectors/flink/utils/SchemaRegistryUtils.java
  */
 package io.pravega.connectors.presto.integration;
 
