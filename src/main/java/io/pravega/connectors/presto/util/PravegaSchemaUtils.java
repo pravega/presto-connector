@@ -40,13 +40,6 @@ public class PravegaSchemaUtils
 
     private static final Logger log = Logger.get(PravegaSchemaUtils.class);
 
-    public static final String AVRO_INLINE = "avro-inline";
-    public static final String PROTOBUF_INLINE = "protobuf-inline";
-    public static final String JSON_INLINE = "json-inline";
-    public static final String INLINE_SUFFIX = "-inline";
-    public static final String GROUP_PROPERTIES_INLINE_KEY = "inline";
-    public static final String GROUP_PROPERTIES_INLINE_KV_KEY = "inlinekey";
-    public static final String GROUP_PROPERTIES_INLINE_KV_VALUE = "inlinevalue";
     public static final String AVRO = "avro";
     public static final String PROTOBUF = "protobuf";
     public static final String JSON = "json";
