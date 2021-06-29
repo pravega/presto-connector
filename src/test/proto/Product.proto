@@ -1,3 +1,5 @@
+// compiled and committed to repo, ./src/test/java/io/pravega/protobuf/ProductOuterClass.java
+
 syntax = "proto3";
 package io.pravega.protobuf;
 
