@@ -8,7 +8,7 @@ plugins {
     id 'maven'
 }
 
-apply from: "$rootDir/gradle/checkstyle.gradle"
+apply from: "$rootDir/prestodb/gradle/checkstyle.gradle"
 
 repositories {
     mavenLocal()
