@@ -50,7 +50,6 @@ public class PravegaConnectorConfig
      */
     private File tableDescriptionDir = new File("etc/pravega/");
 
-
     @NotNull
     public URI getControllerURI()
     {
