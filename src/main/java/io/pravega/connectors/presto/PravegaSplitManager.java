@@ -27,14 +27,12 @@ import com.facebook.presto.spi.connector.ConnectorSplitManager;
 import com.facebook.presto.spi.connector.ConnectorTransactionHandle;
 import com.google.common.collect.ImmutableList;
 import io.pravega.client.batch.SegmentRange;
-import io.pravega.client.stream.ReaderGroupConfig;
 
 import javax.inject.Inject;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
@@ -42,7 +40,6 @@ import java.util.function.Supplier;
 import static io.pravega.connectors.presto.PravegaErrorCode.PRAVEGA_SPLIT_ERROR;
 import static io.pravega.connectors.presto.PravegaHandleResolver.convertLayout;
 import static io.pravega.connectors.presto.util.PravegaNameUtils.multiSourceStream;
-import static io.pravega.connectors.presto.util.PravegaNameUtils.scopedName;
 import static io.pravega.connectors.presto.util.PravegaSerializationUtils.serialize;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -101,17 +98,7 @@ public class PravegaSplitManager
 
     private static ReaderType readerType(PravegaProperties properties)
     {
-        String type = properties.getReaderType();
-        switch (type) {
-            case "event":
-                return ReaderType.EVENT_STREAM;
-            case "grouped_event":
-                return ReaderType.SINGLE_GROUP_EVENT_STREAM;
-            case "segment_range_per_split":
-                return ReaderType.SEGMENT_RANGE_PER_SPLIT;
-            default:
-                return ReaderType.SEGMENT_RANGE;
-        }
+        return ReaderType.SEGMENT_RANGE_PER_SPLIT;
     }
 
     private void buildKVSplits(PravegaTableHandle pravegaTableHandle, ImmutableList.Builder<ConnectorSplit> splits)
@@ -149,25 +136,7 @@ public class PravegaSplitManager
         sourceStreams.forEach(stream -> {
             StreamCutSupplier streamCutSupplier = new StreamCutSupplier(streamReaderManager, pravegaTableHandle.getSchemaName(), stream);
 
-            Supplier<PravegaSplit> splitSupplier;
-            log.info("get split supplier for " + readerType);
-            switch (readerType) {
-                case EVENT_STREAM:
-                case SEGMENT_RANGE:
-                    splitSupplier = splitSupplier(readerType, pravegaTableHandle, stream, streamCutSupplier);
-                    break;
-
-                case SINGLE_GROUP_EVENT_STREAM:
-                    splitSupplier = groupedReaderSplitSupplier(readerType, pravegaTableHandle, stream, streamCutSupplier, properties.getGroupedEventSplits());
-                    break;
-
-                case SEGMENT_RANGE_PER_SPLIT:
-                    splitSupplier = segmentPerSplitSupplier(readerType, pravegaTableHandle, stream, streamCutSupplier);
-                    break;
-
-                default:
-                    throw new IllegalArgumentException("" + readerType);
-            }
+            Supplier<PravegaSplit> splitSupplier = segmentPerSplitSupplier(readerType, pravegaTableHandle, stream, streamCutSupplier);
 
             PravegaSplit split = splitSupplier.get();
             do {
@@ -178,82 +147,6 @@ public class PravegaSplitManager
         });
 
         log.info("created " + splitCounter.get() + " stream splits of type " + readerType);
-    }
-
-    Supplier<PravegaSplit> splitSupplier(final ReaderType readerType,
-                                         final PravegaTableHandle tableHandle,
-                                         final String stream,
-                                         final StreamCutSupplier streamCutSupplier)
-    {
-        return () -> {
-            StreamCutRange range = streamCutSupplier.get();
-            if (range == null) {
-                return null;
-            }
-
-            log.info(readerType + " split " + range);
-
-            return new PravegaSplit(
-                    connectorId,
-                    ObjectType.STREAM,
-                    Collections.singletonList(tableHandle.getSchema().get(0)),
-                    readerType,
-                    serialize(new ReaderArgs(tableHandle.getSchemaName(), stream, range, null)),
-                    tableHandle.getSchemaRegistryGroupId());
-        };
-    }
-
-    Supplier<PravegaSplit> groupedReaderSplitSupplier(final ReaderType readerType,
-                                                      final PravegaTableHandle tableHandle,
-                                                      final String stream,
-                                                      final StreamCutSupplier streamCutSupplier,
-                                                      final int numSplits)
-    {
-        StreamCutRange first = streamCutSupplier.get();
-        StreamCutRange last = null;
-        do {
-            StreamCutRange range = streamCutSupplier.get();
-            if (range == null) {
-                break;
-            }
-            last = range;
-        } while (true);
-
-        if (last == null) {
-            throw new IllegalStateException("no end split");
-        }
-        StreamCutRange range = new StreamCutRange(first.getStart(), last.getEnd());
-
-        log.info(readerType + " split " + range);
-        String readerGroup = UUID.randomUUID().toString();
-
-        final ReaderArgs readerArgs =
-                new ReaderArgs(tableHandle.getSchemaName(), stream, range, readerGroup);
-        ReaderGroupConfig config =
-                ReaderGroupConfig.builder()
-                        .stream(scopedName(readerArgs.getScope(), readerArgs.getStream()),
-                                readerArgs.getStreamCutRange().getStart(),
-                                readerArgs.getStreamCutRange().getEnd())
-                        .build();
-
-        log.info("create reader group " + readerGroup);
-        streamReaderManager.readerGroupManager(
-                tableHandle.getSchemaName()).createReaderGroup(readerGroup, config);
-
-        final AtomicInteger splitCounter = new AtomicInteger();
-
-        return () -> {
-            if (splitCounter.getAndIncrement() == numSplits) {
-                return null;
-            }
-            return new PravegaSplit(
-                    connectorId,
-                    ObjectType.STREAM,
-                    Collections.singletonList(tableHandle.getSchema().get(0)),
-                    readerType,
-                    serialize(readerArgs),
-                    tableHandle.getSchemaRegistryGroupId());
-        };
     }
 
     Supplier<PravegaSplit> segmentPerSplitSupplier(final ReaderType readerType,

@@ -81,25 +81,8 @@ public class PravegaRecordSet
     @Override
     public RecordCursor cursor()
     {
-        Iterator<DecodableEvent> eventIterator;
-
-        switch (split.getReaderType()) {
-            case EVENT_STREAM:
-            case SINGLE_GROUP_EVENT_STREAM:
-                eventIterator = new EventStreamIterator(segmentManager, deserialize(split.getReaderArgs(), ReaderArgs.class), properties);
-                break;
-
-            case SEGMENT_RANGE:
-                eventIterator = new SegmentRangeIterator(segmentManager, deserialize(split.getReaderArgs(), ReaderArgs.class));
-                break;
-
-            case SEGMENT_RANGE_PER_SPLIT:
-                eventIterator = new SegmentEventIterator(segmentManager, deserialize(split.getReaderArgs(), SegmentRange.class));
-                break;
-
-            default:
-                throw new IllegalArgumentException("readerType " + split.getReaderType());
-        }
+        Iterator<DecodableEvent> eventIterator =
+                new SegmentEventIterator(segmentManager, deserialize(split.getReaderArgs(), SegmentRange.class));
 
         return new PravegaRecordCursor(eventIterator, columnHandles, eventDecoder, properties, split.getSchema().get(0).getFormat());
     }
