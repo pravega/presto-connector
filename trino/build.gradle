@@ -7,8 +7,7 @@ plugins {
     id 'distribution'
     id 'maven'
 }
-
-apply from: "$rootDir/trino/gradle/checkstyle.gradle"
+apply from: "$rootDir/gradle/checkstyle.gradle"
 
 repositories {
     mavenLocal()
