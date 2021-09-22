@@ -14,7 +14,12 @@
 
 name: Java CI
 
-on: [push]
+# Set up when this workflow will run.
+on:
+  push:
+    branches:
+      - main                   # On every push to the main branch.
+  pull_request:                # On every pull request, regardless of source/target branch.
 
 env:
   BUILD_CACHE_PATH: ./*
