@@ -86,7 +86,7 @@ public class PravegaSplitManager
 
             return new FixedSplitSource(splits.build());
         }
-        catch (Exception e) { // Catch all exceptions because Pravega library is written in scala and checked exceptions are not declared in method signature.
+        catch (Exception e) {
             if (e instanceof PrestoException) {
                 throw e;
             }
