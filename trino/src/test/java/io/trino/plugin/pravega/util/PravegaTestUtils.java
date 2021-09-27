@@ -17,6 +17,7 @@ package io.trino.plugin.pravega.util;
 
 import io.airlift.json.JsonCodec;
 import io.pravega.client.admin.StreamManager;
+import io.trino.metadata.MetadataManager;
 import io.trino.metadata.QualifiedObjectName;
 import io.trino.plugin.pravega.PravegaStreamDescription;
 import io.trino.plugin.pravega.integration.PravegaKeyValueLoader;
@@ -45,7 +46,7 @@ public final class PravegaTestUtils
     {
         JsonCodec<PravegaStreamDescription> streamDescCodec = new CodecSupplier<>(
                 PravegaStreamDescription.class,
-                FunctionAndTypeManager.createTestFunctionAndTypeManager()).get();
+                MetadataManager.createTestMetadataManager()).get();
         return new LocalSchemaRegistry(new File("src/test/resources/" + dir).getAbsoluteFile(), streamDescCodec);
     }
 
