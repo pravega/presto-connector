@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="integration">
+    <test name="integration-test">
+        <packages>
+            <package name="io.trino.plugin.pravega.integration"/>
+        </packages>
+    </test>
+</suite>

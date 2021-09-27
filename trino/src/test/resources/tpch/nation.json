@@ -1,0 +1,30 @@
+{
+    "tableName": "nation",
+    "schemaName": "tpch",
+    "objectName": "nation",
+    "event": [{
+        "dataFormat": "json",
+        "fields": [
+            {
+                "name": "nationkey",
+                "mapping": "nationkey",
+                "type": "BIGINT"
+            },
+            {
+                "name": "name",
+                "mapping": "name",
+                "type": "VARCHAR(25)"
+            },
+            {
+                "name": "regionkey",
+                "mapping": "regionkey",
+                "type": "BIGINT"
+            },
+            {
+                "name": "comment",
+                "mapping": "comment",
+                "type": "VARCHAR(152)"
+            }
+        ]
+    }]
+}

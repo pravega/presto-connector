@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="unit">
+    <test name="unit-test">
+        <packages>
+            <package name="io.trino.plugin.pravega"/>
+            <package name="io.trino.plugin.pravega.decoder"/>
+        </packages>
+    </test>
+</suite>
