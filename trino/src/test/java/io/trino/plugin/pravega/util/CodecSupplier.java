@@ -18,7 +18,7 @@
  * https://github.com/prestodb/presto/blob/0.247/presto-kafka/src/test/java/com/facebook/presto/kafka/util/CodecSupplier.java
  */
 
-package io.trino.plugin.pravega.integration;
+package io.trino.plugin.pravega.util;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer;

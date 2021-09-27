@@ -70,7 +70,7 @@ public class PravegaSchemaUtils
                 }
             }
             else {
-                inputStream = new FileInputStream(dataSchemaLocation);
+                inputStream = new FileInputStream(new File(schemaDir, dataSchemaLocation));
             }
             return CharStreams.toString(new InputStreamReader(inputStream, UTF_8));
         }

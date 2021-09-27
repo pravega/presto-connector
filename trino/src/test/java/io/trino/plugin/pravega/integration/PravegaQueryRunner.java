@@ -15,35 +15,34 @@
  */
 package io.trino.plugin.pravega.integration;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
-import io.airlift.json.JsonCodec;
 import io.airlift.log.Logger;
 import io.airlift.log.Logging;
 import io.pravega.client.admin.StreamManager;
+
 import io.trino.Session;
-import io.trino.metadata.Metadata;
 import io.trino.metadata.QualifiedObjectName;
 import io.trino.plugin.pravega.PravegaPlugin;
-import io.trino.plugin.pravega.PravegaStreamDescription;
 import io.trino.plugin.pravega.PravegaTableDescriptionSupplier;
-import io.trino.plugin.pravega.PravegaTableName;
+import io.trino.plugin.pravega.schemamanagement.CompositeSchemaRegistry;
+import io.trino.plugin.pravega.schemamanagement.LocalSchemaRegistry;
+import io.trino.plugin.pravega.schemamanagement.SchemaRegistry;
+import io.trino.plugin.pravega.schemamanagement.SchemaSupplier;
+import io.trino.plugin.pravega.util.PravegaTestUtils;
 import io.trino.plugin.tpch.TpchPlugin;
-import io.trino.spi.connector.SchemaTableName;
 import io.trino.testing.DistributedQueryRunner;
 import io.trino.testing.QueryRunner;
 import io.trino.testing.TestingTrinoClient;
 import io.trino.tpch.TpchTable;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static io.airlift.testing.Closeables.closeAllSuppress;
 import static io.airlift.units.Duration.nanosSince;
-import static io.trino.plugin.pravega.integration.PravegaTestUtils.getKvStreamDesc;
-import static io.trino.plugin.pravega.integration.PravegaTestUtils.getStreamDesc;
+
 import static io.trino.plugin.tpch.TpchMetadata.TINY_SCHEMA_NAME;
 import static io.trino.testing.TestingSession.testSessionBuilder;
 import static java.util.Locale.ENGLISH;
@@ -71,8 +70,7 @@ public final class PravegaQueryRunner
             queryRunner.installPlugin(new TpchPlugin());
             queryRunner.createCatalog("tpch", "tpch");
 
-            PravegaTableDescriptionSupplier tableDescriptionSupplier =
-                    createSchemas(queryRunner.getCoordinator().getMetadata(), tpchTables, keyValueTables);
+            PravegaTableDescriptionSupplier tableDescriptionSupplier = createTableDescriptionSupplier(tpchTables, keyValueTables);
 
             installPlugin(controller, queryRunner, tableDescriptionSupplier);
 
@@ -120,31 +118,24 @@ public final class PravegaQueryRunner
         log.info("Imported %s in %s", 0, table, nanosSince(start).convertToMostSuccinctTimeUnit());
     }
 
-    private static PravegaTableDescriptionSupplier createSchemas(Metadata metadata, Iterable<TpchTable<?>> tables, Iterable<String> keyValueTables)
+    private static PravegaTableDescriptionSupplier createTableDescriptionSupplier(Iterable<TpchTable<?>> tpchTables, Iterable<String> keyValueTables)
     {
-        JsonCodec<PravegaStreamDescription> streamDescCodec = new CodecSupplier<>(PravegaStreamDescription.class, metadata).get();
+        List<SchemaSupplier> schemaSuppliers = new ArrayList<>();
+        List<SchemaRegistry> schemaRegistries = new ArrayList<>();
 
-        Cache<String, Object> schemaCache = CacheBuilder.newBuilder().build();
-        Cache<PravegaTableName, Optional<PravegaStreamDescription>> tableCache = CacheBuilder.newBuilder().build();
-
-        for (TpchTable<?> table : tables) {
-            SchemaTableName schemaTableName = new SchemaTableName(TPCH_SCHEMA, table.getTableName());
-            PravegaTableName pravegaTableName = new PravegaTableName(schemaTableName);
-
-            schemaCache.put(schemaTableName.getSchemaName(), new Object());
-            tableCache.put(pravegaTableName, Optional.of(getStreamDesc(streamDescCodec, "tpch", table.getTableName())));
+        if (tpchTables.iterator().hasNext()) {
+            LocalSchemaRegistry tpch = PravegaTestUtils.localSchemaRegistry("tpch");
+            schemaSuppliers.add(tpch);
+            schemaRegistries.add(tpch);
         }
 
-        for (String table : keyValueTables) {
-            SchemaTableName schemaTableName = new SchemaTableName(KV_SCHEMA, table);
-            PravegaTableName pravegaTableName = new PravegaTableName(schemaTableName);
-
-            schemaCache.put(schemaTableName.getSchemaName(), new Object());
-            tableCache.put(pravegaTableName, Optional.of(getKvStreamDesc(table)));
+        if (keyValueTables.iterator().hasNext()) {
+            LocalSchemaRegistry kv = PravegaTestUtils.localSchemaRegistry("kv");
+            schemaSuppliers.add(kv);
+            schemaRegistries.add(kv);
         }
 
-        // all schemas + tables will be served from these provided caches
-        return new PravegaTableDescriptionSupplier(null, schemaCache, tableCache);
+        return new PravegaTableDescriptionSupplier(new CompositeSchemaRegistry(schemaSuppliers, schemaRegistries));
     }
 
     public static Session createSession()
