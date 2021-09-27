@@ -1,0 +1,25 @@
+{
+    "tableName": "region",
+    "schemaName": "tpch",
+    "objectName": "region",
+    "event": [{
+        "dataFormat": "json",
+        "fields": [
+            {
+                "name": "regionkey",
+                "mapping": "regionkey",
+                "type": "BIGINT"
+            },
+            {
+                "name": "name",
+                "mapping": "name",
+                "type": "VARCHAR(25)"
+            },
+            {
+                "name": "comment",
+                "mapping": "comment",
+                "type": "VARCHAR(152)"
+            }
+        ]
+    }]
+}
