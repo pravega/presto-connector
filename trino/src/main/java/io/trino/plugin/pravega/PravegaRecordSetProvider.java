@@ -48,12 +48,9 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static io.trino.plugin.pravega.PravegaHandleResolver.convertSplit;
 import static io.trino.plugin.pravega.util.PravegaSchemaUtils.AVRO;
-import static io.trino.plugin.pravega.util.PravegaSchemaUtils.AVRO_INLINE;
 import static io.trino.plugin.pravega.util.PravegaSchemaUtils.CSV;
 import static io.trino.plugin.pravega.util.PravegaSchemaUtils.JSON;
-import static io.trino.plugin.pravega.util.PravegaSchemaUtils.JSON_INLINE;
 import static io.trino.plugin.pravega.util.PravegaSchemaUtils.PROTOBUF;
-import static io.trino.plugin.pravega.util.PravegaSchemaUtils.PROTOBUF_INLINE;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -166,18 +163,12 @@ public class PravegaRecordSetProvider
     {
         switch (schema.getFormat()) {
             case AVRO:
-                return new AvroSerializer(schema.getSchemaLocation().get());
-            case AVRO_INLINE:
-                return new AvroSerializer(serializerConfig);
+                return new AvroSerializer(serializerConfig, schema.getSchemaLocation().get());
 
             case PROTOBUF:
-                return new ProtobufSerializer(schema.getSchemaLocation().get());
-            case PROTOBUF_INLINE:
-                return new ProtobufSerializer(serializerConfig);
+                return new ProtobufSerializer(serializerConfig, schema.getSchemaLocation().get());
 
             case JSON:
-                return new JsonSerializer();
-            case JSON_INLINE:
                 return new JsonSerializer(serializerConfig);
 
             case CSV:
@@ -192,15 +183,12 @@ public class PravegaRecordSetProvider
     {
         switch (schema.getFormat()) {
             case AVRO:
-            case AVRO_INLINE:
                 return new AvroRowDecoder(decoderColumnHandles);
 
             case PROTOBUF:
-            case PROTOBUF_INLINE:
                 return new ProtobufRowDecoder(decoderColumnHandles);
 
             case JSON:
-            case JSON_INLINE:
                 return jsonRowDecoderFactory.create(decoderColumnHandles);
 
             case CSV: {

@@ -1,0 +1,10 @@
+{
+    "namespace": "io.pravega.avro",
+    "type": "record",
+    "name": "Sensor",
+    "fields": [
+        {"name": "sensorId", "type": "int"},
+        {"name": "timestamp", "type": "long"},
+        {"name": "rate", "type": "double"}
+    ]
+}

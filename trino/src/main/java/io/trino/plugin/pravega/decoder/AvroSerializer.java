@@ -16,11 +16,10 @@
 
 package io.trino.plugin.pravega.decoder;
 
-import com.google.protobuf.DynamicMessage;
 import io.pravega.client.stream.Serializer;
 import io.pravega.schemaregistry.serializer.shared.impl.SerializerConfig;
-import io.pravega.schemaregistry.serializers.SerializerFactory;
 import io.trino.plugin.pravega.util.ByteBufferInputStream;
+import io.trino.plugin.pravega.util.PravegaSerializationUtils;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileStream;
 import org.apache.avro.generic.GenericDatumReader;
@@ -49,9 +48,9 @@ public class AvroSerializer
         }
 
         @Override
-        public ByteBuffer serialize(Object value)
+        public ByteBuffer serialize(Object object)
         {
-            return ByteBuffer.wrap(((DynamicMessage) value).toByteArray());
+            return PravegaSerializationUtils.serialize((GenericRecord) object);
         }
 
         @Override
@@ -73,17 +72,15 @@ public class AvroSerializer
         }
     }
 
-    private final Serializer<Object> delegate;
-
-    public AvroSerializer(SerializerConfig config)
+    public AvroSerializer(SerializerConfig config, String schema)
     {
-        this.delegate = SerializerFactory.genericDeserializer(config);
+        super(config, schema);
     }
 
-    public AvroSerializer(String encodedSchema)
+    @Override
+    public Serializer<Object> serializerForSchema(String schema)
     {
-        Schema schema = (new Schema.Parser()).parse(encodedSchema);
-        this.delegate = new GenericRecordSerializer(schema);
+        return new GenericRecordSerializer((new Schema.Parser()).parse(schema));
     }
 
     @Override
@@ -95,7 +92,7 @@ public class AvroSerializer
     @Override
     public GenericRecord deserialize(ByteBuffer serializedValue)
     {
-        return (GenericRecord) delegate.deserialize(serializedValue);
+        return super.deserialize(serializedValue);
     }
 
     @Override

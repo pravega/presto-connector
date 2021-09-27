@@ -20,7 +20,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import io.airlift.json.JsonCodec;
 import io.airlift.log.Logger;
@@ -58,10 +57,6 @@ import static io.trino.plugin.pravega.util.PravegaNameUtils.kvTable;
 import static io.trino.plugin.pravega.util.PravegaNameUtils.multiSourceStream;
 import static io.trino.plugin.pravega.util.PravegaNameUtils.temp_streamNameToTableName;
 import static io.trino.plugin.pravega.util.PravegaNameUtils.temp_tableNameToStreamName;
-import static io.trino.plugin.pravega.util.PravegaSchemaUtils.GROUP_PROPERTIES_INLINE_KEY;
-import static io.trino.plugin.pravega.util.PravegaSchemaUtils.GROUP_PROPERTIES_INLINE_KV_KEY;
-import static io.trino.plugin.pravega.util.PravegaSchemaUtils.GROUP_PROPERTIES_INLINE_KV_VALUE;
-import static io.trino.plugin.pravega.util.PravegaSchemaUtils.INLINE_SUFFIX;
 import static io.trino.plugin.pravega.util.PravegaSchemaUtils.readSchema;
 import static io.trino.plugin.pravega.util.PravegaStreamDescUtils.mapFieldsFromSchema;
 import static java.nio.file.Files.readAllBytes;
@@ -371,7 +366,7 @@ public class PravegaTableDescriptionSupplier
 
             SerializationFormat format = schemas.get(i).getSchemaInfo().getSerializationFormat();
             fieldGroups.add(new PravegaStreamFieldGroup(
-                    dataFormat(properties.getProperties(), format, kv, i),
+                    normalizeDataFormat(format),
                     Optional.of(colPrefix),
                     dataSchema(format, schemas.get(i)),
                     Optional.of(mapFieldsFromSchema(colPrefix, format, schemas.get(i)))));
@@ -443,34 +438,12 @@ public class PravegaTableDescriptionSupplier
         return ImmutableList.of();
     }
 
-    private static String dataFormat(ImmutableMap<String, String> groupProperties,
-            SerializationFormat format,
-            boolean kvTable,
-            int kvIdx)
+    private static String normalizeDataFormat(SerializationFormat format)
     {
-        /*
-            TODO: auto-detect https://github.com/pravega/presto-connector/issues/20
-            (1) no schema registry.
-            (2) Register and evolve schemas in registry but do not use registry client while writing data
-            (3) Register schemas in the registry and use registry client to encode schema Id with payload
-            "inline" is for #3.  for e.g. "avro" -> "avro-inline".  PravegaRecordSetProvider is interested in this
-            hopefully this can all go away (see linked issue 58 above)
-            but for now the following is our convention
-            if "inline" exists in our properties, all data uses SR
-            else if it is a kv table key+value may be different.  both, neither, or either may use SR
-            look for "inlinekey" / "inlinevalue"
-         */
-
-        String key = GROUP_PROPERTIES_INLINE_KEY;
-
-        if (kvTable && !groupProperties.containsKey(key)) {
-            key = kvIdx == 0 ? GROUP_PROPERTIES_INLINE_KV_KEY : GROUP_PROPERTIES_INLINE_KV_VALUE;
-        }
-
-        String finalFormat = format == SerializationFormat.Custom
+        // (CSV is custom)
+        return format == SerializationFormat.Custom
                 ? format.getFullTypeName().toLowerCase(Locale.ENGLISH)
                 : format.name().toLowerCase(Locale.ENGLISH);
-        return finalFormat + (groupProperties.containsKey(key) ? INLINE_SUFFIX : "");
     }
 
     private static Optional<String> dataSchema(SerializationFormat format, SchemaWithVersion schemaWithVersion)

@@ -7,15 +7,10 @@ plugins {
     id 'distribution'
     id 'maven'
     id 'com.github.davidmc24.gradle.plugin.avro-base' version "1.0.0"
-    //id 'com.google.protobuf' version "0.8.16"
 }
 
 apply plugin: 'java'
 apply from: "$rootDir/gradle/checkstyle.gradle"
-
-// protobufs needed for test are already compiled
-//apply plugin: 'com.google.protobuf'
-//sourceSets.main.java.srcDirs += 'build/generated/source/proto/test/java/'
 
 apply plugin: "com.github.davidmc24.gradle.plugin.avro"
 sourceSets.main.java.srcDirs += 'build/generated-test-avro-java/'
