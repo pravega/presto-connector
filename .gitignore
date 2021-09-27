@@ -26,3 +26,4 @@ benchmark_outputs
 .editorconfig
 node_modules
 
+/prestodb/controller-server.log
