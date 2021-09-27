@@ -30,7 +30,7 @@ import java.util.List;
 import static org.testng.Assert.*;
 
 @Test
-public class LocalSchemaRegistryTest
+public class TestLocalSchemaRegistry
 {
     // uses resources/tpch for table description dir
 

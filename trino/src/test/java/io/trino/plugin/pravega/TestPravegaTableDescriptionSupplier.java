@@ -25,7 +25,7 @@ import static io.trino.plugin.pravega.util.TestSchemas.EMPLOYEE_AVSC;
 import static org.testng.Assert.*;
 
 @Test
-public class PravegaTableDescriptionSupplierTest
+public class TestPravegaTableDescriptionSupplier
 {
     private static final String SCHEMA = "ut";
 

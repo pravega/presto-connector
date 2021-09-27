@@ -30,7 +30,7 @@ import static io.trino.plugin.pravega.util.TestSchemas.EMPLOYEE_AVSC;
 import static org.testng.Assert.*;
 
 @Test
-public class PravegaSchemaRegistryTest
+public class TestPravegaSchemaRegistry
 {
     @Test
     public void testListSchemas()
