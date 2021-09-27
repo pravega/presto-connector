@@ -60,12 +60,12 @@ import static org.testng.Assert.*;
  * if that fails fallback to trying with SchemaRegistry SerializerConfig
  */
 @Test
-public class KVSerializerTest {
+public class TestKVSerializer {
     private final EmbeddedSchemaRegistry schemaRegistry;
 
     private final Random random = new Random();
 
-    public KVSerializerTest() {
+    public TestKVSerializer() {
         this.schemaRegistry = new EmbeddedSchemaRegistry();
         this.schemaRegistry.start();
     }
@@ -112,7 +112,7 @@ public class KVSerializerTest {
         JsonNode actual = jsonSerializer.deserialize(serialized);
 
         assertEquals(actual.get("id").asInt(), expected.id);
-        assertEquals(actual.get("firs").asText(), expected.first);
+        assertEquals(actual.get("first").asText(), expected.first);
         assertEquals(actual.get("last").asText(), expected.last);
 
         assertFalse(jsonSerializer.schemaRegistryDeserializer());
