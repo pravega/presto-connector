@@ -1,0 +1,9 @@
+{
+    "namespace": "io.pravega.avro",
+    "type": "record",
+    "name": "Value",
+    "fields": [
+        {"name": "first", "type": "string"},
+        {"name": "last", "type": "string"}
+    ]
+}

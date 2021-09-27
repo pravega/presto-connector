@@ -1,0 +1,17 @@
+{
+  "schemaName": "kv",
+  "tableName": "employee",
+  "objectName": "employee",
+  "objectType": "KV_TABLE",
+  "objectArgs": ["kf1"],
+  "event": [
+    {
+      "dataFormat": "avro",
+      "dataSchema": "employee-id.avsc"
+    },
+    {
+      "dataFormat": "avro",
+      "dataSchema": "employee-value.avsc"
+    }
+  ]
+}
