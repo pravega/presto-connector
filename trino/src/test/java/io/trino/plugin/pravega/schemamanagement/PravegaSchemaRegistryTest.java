@@ -15,18 +15,18 @@
  */
 package io.trino.plugin.pravega.schemamanagement;
 
-import com.facebook.presto.common.type.VarcharType;
-import com.facebook.presto.spi.SchemaTableName;
-import io.pravega.connectors.presto.PravegaStreamDescription;
-import io.pravega.connectors.presto.PravegaStreamFieldDescription;
-import io.pravega.connectors.presto.PravegaStreamFieldGroup;
-import io.pravega.connectors.presto.PravegaTableHandle;
-import io.pravega.connectors.presto.util.SchemaRegistryUtil;
+import io.trino.plugin.pravega.PravegaStreamDescription;
+import io.trino.plugin.pravega.PravegaStreamFieldDescription;
+import io.trino.plugin.pravega.PravegaStreamFieldGroup;
+import io.trino.plugin.pravega.PravegaTableHandle;
+import io.trino.plugin.pravega.util.SchemaRegistryUtil;
+import io.trino.spi.connector.SchemaTableName;
+import io.trino.spi.type.VarcharType;
 import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static io.pravega.connectors.presto.util.TestSchemas.EMPLOYEE_AVSC;
+import static io.trino.plugin.pravega.util.TestSchemas.EMPLOYEE_AVSC;
 import static org.testng.Assert.*;
 
 @Test
