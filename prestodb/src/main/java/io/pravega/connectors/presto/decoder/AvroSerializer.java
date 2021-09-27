@@ -32,7 +32,8 @@ import java.nio.ByteBuffer;
 
 // deserialize using externally provided schema or using SR+SerializerConfig
 public class AvroSerializer
-        extends KVSerializer<GenericRecord> {
+        extends KVSerializer<GenericRecord>
+{
 
     private static class GenericRecordSerializer
             implements Serializer<Object> {
@@ -40,7 +41,8 @@ public class AvroSerializer
 
         private final Schema schema;
 
-        GenericRecordSerializer(Schema schema) {
+        GenericRecordSerializer(Schema schema)
+        {
             this.datumReader = new GenericDatumReader(schema);
             this.schema = schema;
         }
@@ -52,7 +54,8 @@ public class AvroSerializer
         }
 
         @Override
-        public GenericRecord deserialize(ByteBuffer serializedValue) {
+        public GenericRecord deserialize(ByteBuffer serializedValue)
+        {
             try (DataFileStream<GenericRecord> dataFileReader =
                          new DataFileStream<>(new ByteBufferInputStream(serializedValue), datumReader)) {
                 // TODO: need to figure out how to auto-detect format of avro data
@@ -62,7 +65,8 @@ public class AvroSerializer
                 //
                 // for now we will do it the "presto way"
                 return dataFileReader.next();
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
         }

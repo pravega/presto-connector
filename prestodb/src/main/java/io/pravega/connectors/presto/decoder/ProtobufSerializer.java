@@ -32,32 +32,39 @@ import static io.pravega.connectors.presto.ProtobufCommon.descriptorFor;
 
 // deserialize using externally provided schema or using SR+SerializerConfig
 public class ProtobufSerializer
-        extends KVSerializer<DynamicMessage> {
+        extends KVSerializer<DynamicMessage>
+{
     private static class DynamicMessageSerializer
-            implements Serializer<Object> {
+            implements Serializer<Object>
+    {
         private final Descriptors.Descriptor descriptor;
 
-        DynamicMessageSerializer(Descriptors.Descriptor descriptor) {
+        DynamicMessageSerializer(Descriptors.Descriptor descriptor)
+        {
             this.descriptor = descriptor;
         }
 
         @Override
-        public ByteBuffer serialize(Object value) {
+        public ByteBuffer serialize(Object value)
+        {
             return ByteBuffer.wrap(((DynamicMessage) value).toByteArray());
         }
 
         @Override
-        public DynamicMessage deserialize(ByteBuffer serializedValue) {
+        public DynamicMessage deserialize(ByteBuffer serializedValue)
+        {
             try {
                 return DynamicMessage.parseFrom(descriptor,
                         new ByteBufferInputStream(serializedValue));
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
         }
     }
 
-    public ProtobufSerializer(SerializerConfig config, String schema) {
+    public ProtobufSerializer(SerializerConfig config, String schema)
+    {
         super(config, schema);
     }
 
