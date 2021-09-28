@@ -111,6 +111,7 @@ distributions {
         contents {
             distributionBaseName = 'pravega-trino-connector'
             from jar
+            from(project.configurations.runtime)
         }
     }
 }
