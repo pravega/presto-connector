@@ -1,0 +1,85 @@
+/**
+ * Copyright Pravega Authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+plugins.withId('maven') {
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                // Only configure publishing if a URL was provided
+                if (project.hasProperty("publishUrl")) {
+                    if (publishUrl == "mavenCentral") {
+                        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                            authentication(userName: publishUsername, password: publishPassword)
+                        }
+                        snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                            authentication(userName: publishUsername, password: publishPassword)
+                        }
+                    } else {
+                        repository(url: publishUrl) {
+                            // Only configure credentials if they are provided (allows publishing to the filesystem)
+                            if (project.hasProperty("publishUsername") && project.hasProperty("publishPassword")) {
+                                authentication(userName: publishUsername, password: publishPassword)
+                            }
+                        }
+                    }
+                }
+
+                /* pom.artifactId = "presto-connector" + project.path.replace(':', '-') */
+                pom.artifactId = "pravega-trino-connector"
+                pom.project {
+                    name "Pravega Presto Connector"
+                    url "https://pravega.io"
+                    description "Streaming Storage Platform"
+                    scm {
+                        url 'https://github.com/pravega/pravega/tree/master'
+                        connection 'scm:git:git://github.com/pravega/presto-connector.git'
+                        developerConnection 'scm:git:https://github.com/pravega/presto-connector.git'
+                    }
+                    licenses {
+                        license {
+                            name 'The Apache License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id 'chipmaurer'
+                            name 'Chip Maurer'
+                        }
+                    }
+                }
+
+                // Sign the POM when the signing plugin is present
+                plugins.withId('signing') {
+                    if (project.hasProperty('doSigning')) {
+                        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                    }
+                }
+            }
+        }
+    }
+
+    install {
+        repositories {
+            mavenInstaller {
+                /* pom.artifactId = "presto-connector" + project.path.replace(':', '-') */
+                pom.artifactId = "pravega-trino-connector"
+            }
+        }
+    }
+
+    task publish(dependsOn:'uploadArchives') {
+    }
+}
