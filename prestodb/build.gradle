@@ -104,6 +104,7 @@ distributions {
         contents {
             distributionBaseName = 'pravega-presto-connector'
             from jar
+            from(project.configurations.runtime)
         }
     }
 }
