@@ -28,13 +28,13 @@ import org.apache.commons.cli.Options;
 
 import javax.ws.rs.ProcessingException;
 import java.io.PrintWriter;
-import java.util.Map;
 
 public class DemoUtils {
 
     private DemoUtils() {}
 
     public static String groupId(String scope, String stream) {
+        // scope.stream which translates to presto schema.table
         return scope + "." + stream;
     }
 
@@ -79,6 +79,7 @@ public class DemoUtils {
                                                       SerializationFormat serializationFormat,
                                                       String scope, String stream,
                                                       ImmutableMap<String, String> properties) {
+        // note our SR group format - scope.stream which translates to presto schema.table
         String groupId = groupId(scope, stream);
 
         SchemaRegistryClient schemaRegistryClient =

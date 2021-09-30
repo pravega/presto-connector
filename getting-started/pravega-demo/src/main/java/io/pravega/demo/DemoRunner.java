@@ -78,6 +78,7 @@ public class DemoRunner {
                 inventorySchemaRegistrySerializer(schemaRegistryConfig, scope, INVENTORY_STREAM),
                 inventoryDataSupplier());
 
+        // show the schema that was persisted during ingest
         Schema.showSchema(log, schemaRegistryConfig, scope, INVENTORY_STREAM);
 
 
@@ -89,18 +90,18 @@ public class DemoRunner {
                 sensorSerializer(schemaRegistryConfig, scope, SENSOR_STREAM),
                 sensorDataSupplier());
 
+        // show the schema that was explicitly added
         Schema.showSchema(log, schemaRegistryConfig, scope, SENSOR_STREAM);
 
 
         // case 3
         // we serialize events ourselves
-        // no schema is persisted
+        // schema registry group is not added
+        // schema is not persisted (schema will come from user defined file getting-started/etc/pravega/demo.transactions.json)
         new DataIngest<Transaction>(controllerUri).ingest(log,
                 scope, TRANSACTIONS_STREAM,
-                new JsonSerializer<>(),
+                new JsonSerializer<>() /* SR-unaware serializer */,
                 txnDataSupplier());
-
-        // no schema to show
     }
 
     Serializer<Sensor> sensorSerializer(SchemaRegistryClientConfig schemaRegistryConfig,
@@ -111,16 +112,24 @@ public class DemoRunner {
 
         SchemaRegistryClient schemaRegistryClient =
                 SchemaRegistryClientFactory.withDefaultNamespace(schemaRegistryConfig);
+
+        // here we are storing schema in SR but note that we add the schema explicitly
         schemaRegistryClient.addSchema(groupId(scope, stream), JSONSchema.of(Sensor.class).getSchemaInfo());
 
+        // returning our own SR-unaware serializer
         return new JsonSerializer<>();
     }
 
     Serializer<Inventory> inventorySchemaRegistrySerializer(SchemaRegistryClientConfig schemaRegistryConfig,
                                                           String scope, String stream) {
+
+        // since we are using SR serializer we must let the connector know about it
+        // add a bool property to the group here
+        // this will soon be an unnecessary step as there is PR for auto-detection
         // https://github.com/pravega/presto-connector/issues/20
         ImmutableMap<String, String> properties =
                 ImmutableMap.<String, String>builder().put("inline", "true").build();
+
         addSchemaRegistryGroupIfAbsent(schemaRegistryConfig,
                 SerializationFormat.Avro,
                 scope, stream,
