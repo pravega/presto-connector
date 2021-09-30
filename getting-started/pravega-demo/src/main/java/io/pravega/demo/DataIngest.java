@@ -36,7 +36,11 @@ public class DataIngest<T> {
     }
 
     public void ingest(PrintWriter log, String scope, String stream, Serializer<T> serializer, Supplier<T> data) {
+        // write object/event data to pravega stream
+        // note this class/method doesn't know anything about schema
+
         log.println("start data ingestion to " + scope + "." + stream);
+        log.flush();
 
         try (StreamManager streamManager = StreamManager.create(clientConfig)) {
             if (!streamManager.checkScopeExists(scope)) {
@@ -69,6 +73,7 @@ public class DataIngest<T> {
                     if (++events % flushInterval == 0) {
                         streamWriter.flush();
                         log.println("wrote " + events + " events");
+                        log.flush();
                     }
 
                     next = data.get();

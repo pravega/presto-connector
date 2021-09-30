@@ -15,7 +15,7 @@ export HOST_IP=192.168.49.1
 ### Build Image w/ Pravega Plugin
 You must first build a presto image that contains the pravega connector plugin.
 This script will download a pravega plugin release, and add it to a base presto image.
-It will also add the sample schema file(s).
+It will also add the sample schema files (from ./etc/pravega)
 
 ```
 sh build-image.sh
@@ -35,7 +35,7 @@ sh demo.sh
 
 ### presto-cli
 ```
-$ docker exec -it `docker ps | grep presto-with-pravega | awk '{print $1}'` presto-cli
+docker exec -it `docker ps | grep presto-with-pravega | awk '{print $1}'` presto-cli
 presto> 
 ```
 
