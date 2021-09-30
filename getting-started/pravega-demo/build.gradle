@@ -1,0 +1,78 @@
+plugins {
+    id 'java'
+    id 'distribution'
+    id 'maven'
+    id 'com.github.davidmc24.gradle.plugin.avro' version "1.0.0"
+}
+
+apply plugin: 'java'
+apply plugin: "com.github.davidmc24.gradle.plugin.avro"
+
+sourceSets.main.java.srcDirs += 'build/generated-test-avro-java/'
+
+repositories {
+    mavenLocal()
+
+    maven {
+        url = uri('https://jitpack.io')
+    }
+
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2')
+    }
+}
+
+dependencies {
+    compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    compile "io.pravega:pravega-client:${pravegaVersion}"
+    compile "io.pravega:pravega-common:${pravegaVersion}"
+    compile "io.pravega:pravega-shared-protocol:${pravegaVersion}"
+    compile "com.github.everit-org.json-schema:org.everit.json.schema:${everitJsonSchemaVersion}"
+    compile "org.apache.avro:avro:${avroVersion}"
+    compile "io.pravega:schemaregistry-contract:${pravegaSchemaRegistryVersion}"
+    compile "io.pravega:schemaregistry-common:${pravegaSchemaRegistryVersion}"
+    compile "io.pravega:schemaregistry-client:${pravegaSchemaRegistryVersion}"
+    compile "io.pravega:schemaregistry-serializers:${pravegaSchemaRegistryVersion}"
+    compile "io.pravega:schemaregistry-serializers-shared:${pravegaSchemaRegistryVersion}"
+    compile "io.pravega:schemaregistry-serializers-json:${pravegaSchemaRegistryVersion}"
+    compile "commons-cli:commons-cli:${commonsCliVersion}"
+
+    compileOnly "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+}
+
+group = 'io.pravega.demo'
+version = '0.1.0'
+description = 'Pravega Demo'
+sourceCompatibility = '1.8'
+
+task copyDependentJars(type: Copy) {
+    from configurations.runtime
+    into "$buildDir/demo"
+}
+
+jar {
+    baseName = 'pravega-demo'
+    destinationDir = file("$buildDir/demo")
+    manifest {
+        attributes "Main-Class": "io.pravega.demo.main"
+    }
+}
+
+plugins.withType(DistributionPlugin) {
+    distTar {
+        compression = Compression.GZIP
+        extension = 'tar.gz'
+    }
+}
+
+distributions {
+    main {
+        contents {
+            distributionBaseName = 'pravega-demo'
+            from(project.configurations.runtime)
+            from jar
+        }
+    }
+}
+
+jar.dependsOn(copyDependentJars)

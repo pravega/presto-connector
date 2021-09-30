@@ -1,0 +1,30 @@
+{
+    "schemaName": "demo",
+    "tableName": "transactions",
+    "objectName": "transactions",
+    "event": [{
+        "dataFormat": "json",
+        "fields": [
+            {
+                "name": "txnId",
+                "mapping": "txnId",
+                "type": "BIGINT"
+            },        
+            {
+                "name": "productId",
+                "mapping": "productId",
+                "type": "BIGINT"
+            },                  
+            {
+                "name": "location",
+                "mapping": "location",
+                "type": "VARCHAR"
+            },
+            {
+                "name": "timestamp",
+                "mapping": "timestamp",
+                "type": "BIGINT"
+            }
+        ]
+    }]
+}
