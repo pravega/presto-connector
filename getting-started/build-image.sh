@@ -12,12 +12,19 @@ echo "set pravega and schema-registry configuration"
 echo "connector.name=pravega
 pravega.controller=tcp://$HOST_IP:9090
 pravega.schema-registry=http://$HOST_IP:9092
-" > etc/pravega.properties
+" > etc/catalog/pravega.properties
 
 # our plugin is not built in.  download release
 echo "download pravega plugin"
-curl --silent -O http://192.168.49.1:8000/pravega-presto-connector-0.1.0.tar.gz 2>/dev/null && \
-	tar -xzf pravega-presto-connector-0.1.0.tar.gz && \
+
+pkg=`curl https://github.com/pravega/presto-connector/packages/1017266 2>/dev/null | \
+	 grep -e github-registry.*prestodb-connector-0.1.0.tar.gz\& | \
+	 awk -F '"' '{print $2'} | \
+	 sed -e 's/\&amp;/\&/g'`
+echo $pkg
+
+curl "$pkg" 2>/dev/null --output pravega-plugin.tar.gz && \
+	tar -xzf pravega-plugin.tar.gz && \
 	mv pravega-presto-connector-0.1.0 pravega-plugin
 
 # and add it to existing prestodb image
@@ -25,4 +32,4 @@ echo "build docker image"
 make build-image
 
 # cleanup
-rm -rf ./pravega-plugin ./pravega-presto-connector-0.1.0.tar.gz
+rm -rf ./pravega-plugin ./pravega-plugin.tar.gz
