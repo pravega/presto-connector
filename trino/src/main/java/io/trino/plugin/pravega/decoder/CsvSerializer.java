@@ -15,6 +15,8 @@
  */
 
 package io.trino.plugin.pravega.decoder;
+import io.pravega.client.stream.Serializer;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
@@ -23,6 +25,7 @@ public class CsvSerializer
 {
     public CsvSerializer()
     {
+        super(null, null);
     }
 
     @Override
@@ -37,6 +40,12 @@ public class CsvSerializer
         return new String(serializedValue.array(),
                 serializedValue.arrayOffset() + serializedValue.position(),
                 serializedValue.remaining());
+    }
+
+    @Override
+    public Serializer<Object> serializerForSchema(String schema)
+    {
+        throw new UnsupportedOperationException();
     }
 
     @Override

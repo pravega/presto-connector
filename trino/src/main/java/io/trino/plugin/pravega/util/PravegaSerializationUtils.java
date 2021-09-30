@@ -16,6 +16,10 @@
 
 package io.trino.plugin.pravega.util;
 
+import org.apache.avro.file.DataFileWriter;
+import org.apache.avro.generic.GenericDatumWriter;
+import org.apache.avro.generic.GenericRecord;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,6 +27,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.UncheckedIOException;
+import java.nio.ByteBuffer;
 
 public class PravegaSerializationUtils
 {
@@ -55,6 +60,23 @@ public class PravegaSerializationUtils
         }
         catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(e);
+        }
+    }
+
+    public static ByteBuffer serialize(GenericRecord record)
+    {
+        try {
+            GenericDatumWriter<GenericRecord> writer = new GenericDatumWriter<>(record.getSchema());
+            DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<>(writer);
+
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            dataFileWriter.create(record.getSchema(), os);
+            dataFileWriter.append(record);
+            dataFileWriter.close();
+            return ByteBuffer.wrap(os.toByteArray());
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 }

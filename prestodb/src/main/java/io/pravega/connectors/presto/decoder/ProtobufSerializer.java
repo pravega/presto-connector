@@ -21,7 +21,6 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import io.pravega.client.stream.Serializer;
 import io.pravega.schemaregistry.serializer.shared.impl.SerializerConfig;
-import io.pravega.schemaregistry.serializers.SerializerFactory;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
@@ -64,17 +63,16 @@ public class ProtobufSerializer
         }
     }
 
-    private final Serializer<Object> delegate;
-
-    public ProtobufSerializer(SerializerConfig config)
+    public ProtobufSerializer(SerializerConfig config, String schema)
     {
-        this.delegate = SerializerFactory.genericDeserializer(config);
+        super(config, schema);
     }
 
-    public ProtobufSerializer(String encodedSchema)
+    @Override
+    public Serializer<Object> serializerForSchema(String schema)
     {
-        Pair<String, ByteBuffer> pair = decodeSchema(encodedSchema);
-        this.delegate = new DynamicMessageSerializer(descriptorFor(pair.getLeft(), pair.getRight()));
+        Pair<String, ByteBuffer> pair = decodeSchema(schema);
+        return new DynamicMessageSerializer(descriptorFor(pair.getLeft(), pair.getRight()));
     }
 
     @Override
@@ -86,7 +84,7 @@ public class ProtobufSerializer
     @Override
     public DynamicMessage deserialize(ByteBuffer serializedValue)
     {
-        return (DynamicMessage) delegate.deserialize(serializedValue);
+        return super.deserialize(serializedValue);
     }
 
     @Override

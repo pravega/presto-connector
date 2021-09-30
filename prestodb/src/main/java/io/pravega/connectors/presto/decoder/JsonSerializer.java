@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.pravega.client.stream.Serializer;
 import io.pravega.schemaregistry.serializer.shared.impl.SerializerConfig;
-import io.pravega.schemaregistry.serializers.SerializerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -59,16 +58,15 @@ public class JsonSerializer
         }
     }
 
-    private final Serializer<Object> delegate;
-
     public JsonSerializer(SerializerConfig config)
     {
-        this.delegate = SerializerFactory.genericDeserializer(config);
+        super(config, null);
     }
 
-    public JsonSerializer()
+    @Override
+    public Serializer<Object> serializerForSchema(String schema /* null for json */)
     {
-        this.delegate = new JsonTreeSerializer();
+        return new JsonTreeSerializer();
     }
 
     @Override
@@ -80,7 +78,7 @@ public class JsonSerializer
     @Override
     public JsonNode deserialize(ByteBuffer serializedValue)
     {
-        return (JsonNode) delegate.deserialize(serializedValue);
+        return super.deserialize(serializedValue);
     }
 
     @Override

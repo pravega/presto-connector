@@ -6,16 +6,17 @@ plugins {
     id 'java'
     id 'distribution'
     id 'maven'
+    id 'com.github.davidmc24.gradle.plugin.avro-base' version "1.0.0"
 }
 
+apply plugin: 'java'
 apply from: "$rootDir/gradle/checkstyle.gradle"
+
+apply plugin: "com.github.davidmc24.gradle.plugin.avro"
+sourceSets.main.java.srcDirs += 'build/generated-test-avro-java/'
 
 repositories {
     mavenLocal()
-
-    maven {
-        url = uri('https://oss.jfrog.org/jfrog-dependencies')
-    }
 
     maven {
         url = uri('https://jitpack.io')
@@ -67,6 +68,7 @@ dependencies {
     testImplementation "com.facebook.airlift:testing:${airliftTestingVersion}"
 
     testCompile (group: 'io.pravega', name: 'pravega-standalone', version: pravegaVersion)
+    testImplementation "io.pravega:schemaregistry-server:${pravegaSchemaRegistryVersion}"
 
     compileOnly "io.airlift:slice:${airliftSliceVersion}"
     compileOnly "io.airlift:units:${airliftUnitsVersion}"
