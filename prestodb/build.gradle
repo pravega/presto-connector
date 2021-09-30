@@ -9,6 +9,7 @@ plugins {
 }
 
 apply from: "$rootDir/gradle/checkstyle.gradle"
+apply from: "$rootDir/gradle/maven.gradle"
 
 repositories {
     mavenLocal()
