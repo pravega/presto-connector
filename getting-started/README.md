@@ -5,6 +5,14 @@ This getting started guide will show how you can query events from Pravega
 
 ## Steps
 
+### Select Base Image
+```
+export PRODUCT=trino
+```
+or
+```
+export PRODUCT=prestodb
+```
 
 ### Set HOST_IP
 This IP will be used for the pravega stack
@@ -13,16 +21,16 @@ export HOST_IP=192.168.49.1
 ```
 
 ### Build Image w/ Pravega Plugin
-You must first build a presto image that contains the pravega connector plugin.
-This script will download a pravega plugin release, and add it to a base presto image.
+You must first build an image that contains the pravega connector plugin.
+This script will download a pravega plugin release, and add it to a base image.
 It will also add the sample schema files (from ./etc/pravega)
 
 ```
 sh build-image.sh
-```
+```s
 
 ### Start Services
-This includes pravaga, schema registry, and prestodb
+This includes pravaga, schema registry, and prestodb/trino.
 ```
 docker-compose up -d
 ```
@@ -33,10 +41,15 @@ A sample client is included (source in ./pravega-demo).  It will ingest some exa
 sh demo.sh
 ```
 
-### presto-cli
+### Start appropriate CLI
 ```
-docker exec -it `docker ps | grep presto-with-pravega | awk '{print $1}'` presto-cli
+docker exec -it `docker ps | grep pravega-getting-started | awk '{print $1}'` presto-cli
 presto> 
+```
+
+```
+docker exec -it `docker ps | grep pravega-getting-started | awk '{print $1}'` trino
+trino> 
 ```
 
 ### Exec Queries

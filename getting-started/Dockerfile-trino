@@ -1,0 +1,9 @@
+FROM trinodb/trino:latest
+
+RUN mkdir /usr/lib/trino/plugin/pravega/
+COPY pravega-plugin/* /usr/lib/trino/plugin/pravega/
+
+COPY etc/catalog/pravega.properties /etc/trino/catalog/
+
+RUN mkdir /etc/trino/pravega
+COPY etc/pravega/* /etc/trino/pravega/

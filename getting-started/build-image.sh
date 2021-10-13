@@ -1,12 +1,15 @@
 #!/bin/bash
 
+# prestodb or trino
+image="${PRODUCT:-trino}"
 
-echo $HOST_IP
+echo "build for $image, using HOST_IP: '$HOST_IP'"
 
 if [ -z "$HOST_IP" ]; then
 	echo "please set HOST_IP env variable"
 	exit 1
 fi
+
 
 echo "set pravega and schema-registry configuration"
 echo "connector.name=pravega
@@ -15,21 +18,34 @@ pravega.schema-registry=http://$HOST_IP:9092
 " > etc/catalog/pravega.properties
 
 # our plugin is not built in.  download release
-echo "download pravega plugin"
+echo "download pravega plugin for $image"
 
-pkg=`curl https://github.com/pravega/presto-connector/packages/1017266 2>/dev/null | \
-	 grep -e github-registry.*prestodb-connector-0.1.0.tar.gz\& | \
-	 awk -F '"' '{print $2'} | \
-	 sed -e 's/\&amp;/\&/g'`
-echo $pkg
+pkg=""
+get_pkg() {
+  if [ "$image" = "trino" ]; then
+    page="1017267"
+  else
+    page="1017266"
+  fi
 
-curl "$pkg" 2>/dev/null --output pravega-plugin.tar.gz && \
-	tar -xzf pravega-plugin.tar.gz && \
-	mv pravega-presto-connector-0.1.0 pravega-plugin
+  pkg=`curl "https://github.com/pravega/presto-connector/packages/$page" 2>/dev/null | \
+     grep -e github-registry.*connector.*tar.gz\& | \
+     awk -F '"' '{print $2'} | \
+     sed -e 's/\&amp;/\&/g'`
 
-# and add it to existing prestodb image
-echo "build docker image"
-make build-image
+  curl "$pkg" 2>/dev/null --output pravega-plugin.tar.gz && \
+    tar -xzf pravega-plugin.tar.gz
+
+  mv `find . -name *connector* -type d` pravega-plugin
+}
+
+get_pkg
+
+if [ "$image" = "trino" ]; then
+  make build-trino-image
+else
+  make build-prestodb-image
+fi
 
 # cleanup
 rm -rf ./pravega-plugin ./pravega-plugin.tar.gz

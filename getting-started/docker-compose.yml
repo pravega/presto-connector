@@ -127,8 +127,8 @@ services:
     links:
       - controller
 
-  prestodb:
-    image: prestodb/presto-with-pravega
+  pravegasql:
+    image: pravega-getting-started/pravega-getting-started
     ports:
       - "8080:8080"
     environment:
