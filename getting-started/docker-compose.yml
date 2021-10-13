@@ -122,10 +122,12 @@ services:
     ports:
       - "9092:9092"
     environment:
-      WAIT_FOR: controller:9090
+      WAIT_FOR: controller:9090,segmentstore:12345
       CONTROLLER_URL: tcp://${HOST_IP}:9090
+      PRE_START_CMD: sleep 20
     links:
       - controller
+      - segmentstore
 
   pravegasql:
     image: pravega-getting-started/pravega-getting-started
