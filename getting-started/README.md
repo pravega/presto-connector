@@ -27,7 +27,7 @@ It will also add the sample schema files (from ./etc/pravega)
 
 ```
 sh build-image.sh
-```s
+```
 
 ### Start Services
 This includes pravaga, schema registry, and prestodb/trino.

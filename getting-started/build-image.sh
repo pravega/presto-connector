@@ -34,9 +34,8 @@ get_pkg() {
      sed -e 's/\&amp;/\&/g'`
 
   curl "$pkg" 2>/dev/null --output pravega-plugin.tar.gz && \
-    tar -xzf pravega-plugin.tar.gz
-
-  mv `find . -name *connector* -type d` pravega-plugin
+    tar -xzf pravega-plugin.tar.gz && \
+    mv `find . -name *connector* -type d` pravega-plugin
 }
 
 get_pkg
