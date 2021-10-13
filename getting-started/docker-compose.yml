@@ -122,13 +122,15 @@ services:
     ports:
       - "9092:9092"
     environment:
-      WAIT_FOR: controller:9090
+      WAIT_FOR: controller:9090,segmentstore:12345
       CONTROLLER_URL: tcp://${HOST_IP}:9090
+      PRE_START_CMD: sleep 20
     links:
       - controller
+      - segmentstore
 
-  prestodb:
-    image: prestodb/presto-with-pravega
+  pravegasql:
+    image: pravega-getting-started/pravega-getting-started
     ports:
       - "8080:8080"
     environment:
