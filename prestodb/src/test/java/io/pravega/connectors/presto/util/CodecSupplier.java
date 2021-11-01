@@ -1,6 +1,4 @@
 /*
- * Copyright (c) Dell Inc., or its subsidiaries. All Rights Reserved.
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,34 +15,32 @@
  * (rev a8968160e1840ac67a5f63def27d31c0ef0acde7)
  * https://github.com/prestodb/presto/blob/0.247/presto-kafka/src/test/java/com/facebook/presto/kafka/util/CodecSupplier.java
  */
+package io.pravega.connectors.presto.util;
 
-package io.trino.plugin.pravega.integration;
-
+import com.facebook.airlift.json.JsonCodec;
+import com.facebook.airlift.json.JsonCodecFactory;
+import com.facebook.airlift.json.ObjectMapperProvider;
+import com.facebook.presto.common.type.Type;
+import com.facebook.presto.metadata.FunctionAndTypeManager;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer;
 import com.google.common.collect.ImmutableMap;
-import io.airlift.json.JsonCodec;
-import io.airlift.json.JsonCodecFactory;
-import io.airlift.json.ObjectMapperProvider;
-import io.trino.metadata.Metadata;
-import io.trino.spi.type.Type;
 
-import java.util.HashSet;
 import java.util.function.Supplier;
 
-import static io.trino.sql.analyzer.TypeSignatureTranslator.parseTypeSignature;
+import static com.facebook.presto.common.type.TypeSignature.parseTypeSignature;
 
 public final class CodecSupplier<T>
         implements Supplier<JsonCodec<T>>
 {
-    private final Metadata metadata;
+    private final FunctionAndTypeManager typeManager;
     private final JsonCodecFactory codecFactory;
     private final Class<T> clazz;
 
-    public CodecSupplier(Class<T> clazz, Metadata metadata)
+    public CodecSupplier(Class<T> clazz, FunctionAndTypeManager typeManager)
     {
         this.clazz = clazz;
-        this.metadata = metadata;
+        this.typeManager = typeManager;
         ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
         objectMapperProvider.setJsonDeserializers(ImmutableMap.of(Type.class, new TypeDeserializer()));
         this.codecFactory = new JsonCodecFactory(objectMapperProvider);
@@ -69,7 +65,7 @@ public final class CodecSupplier<T>
         @Override
         protected Type _deserialize(String value, DeserializationContext context)
         {
-            Type type = metadata.getType(parseTypeSignature(value, new HashSet<>()));
+            Type type = typeManager.getType(parseTypeSignature(value));
             if (type == null) {
                 throw new IllegalArgumentException(String.valueOf("Unknown type " + value));
             }

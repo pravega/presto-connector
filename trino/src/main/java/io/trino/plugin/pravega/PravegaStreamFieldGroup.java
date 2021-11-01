@@ -33,7 +33,7 @@ public class PravegaStreamFieldGroup
     private final String dataFormat;
     private final Optional<String> dataSchema;
     private final Optional<List<PravegaStreamFieldDescription>> fields;
-    private final Optional<String> mapping;
+    private final Optional<String> mapping; // column prefix
 
     @JsonCreator
     public PravegaStreamFieldGroup(

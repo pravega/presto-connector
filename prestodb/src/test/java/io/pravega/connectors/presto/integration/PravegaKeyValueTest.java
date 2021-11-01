@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 
 import static com.facebook.presto.testing.TestingSession.testSessionBuilder;
-import static io.pravega.connectors.presto.integration.PravegaTestUtils.getKvStreamDesc;
+import static io.pravega.connectors.presto.util.PravegaTestUtils.getKvStreamDesc;
 import static org.testng.Assert.assertEquals;
 
 @Test

@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static io.trino.plugin.pravega.integration.PravegaTestUtils.getKvStreamDesc;
+import static io.trino.plugin.pravega.util.PravegaTestUtils.getKvStreamDesc;
 import static io.trino.testing.TestingSession.testSessionBuilder;
 import static org.testng.Assert.assertEquals;
 

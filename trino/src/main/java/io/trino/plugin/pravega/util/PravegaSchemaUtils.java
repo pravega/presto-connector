@@ -20,10 +20,7 @@ import com.google.common.io.CharStreams;
 import io.airlift.log.Logger;
 import io.trino.spi.TrinoException;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -54,7 +51,7 @@ public class PravegaSchemaUtils
 
     public static final String NESTED_RECORD_SEPARATOR = "/";
 
-    public static String readSchema(String dataSchemaLocation)
+    public static String readSchema(File schemaDir, String dataSchemaLocation)
     {
         InputStream inputStream = null;
         try {
@@ -65,11 +62,11 @@ public class PravegaSchemaUtils
                 catch (MalformedURLException e) {
                     // try again before failing
                     log.warn("invalid URL: " + dataSchemaLocation);
-                    inputStream = new FileInputStream(dataSchemaLocation);
+                    inputStream = new FileInputStream(new File(schemaDir, dataSchemaLocation));
                 }
             }
             else {
-                inputStream = new FileInputStream(dataSchemaLocation);
+                inputStream = new FileInputStream(new File(schemaDir, dataSchemaLocation));
             }
             return CharStreams.toString(new InputStreamReader(inputStream, UTF_8));
         }

@@ -67,6 +67,17 @@ public class PravegaStreamDescription
         this.event = Optional.of(event);
     }
 
+
+    public PravegaStreamDescription(PravegaStreamDescription streamDescription, List<PravegaStreamFieldGroup> event, List<String> objectArgs)
+    {
+        this.tableName = streamDescription.tableName;
+        this.schemaName = streamDescription.schemaName;
+        this.objectName = streamDescription.objectName;
+        this.objectType = streamDescription.objectType;
+        this.objectArgs = Optional.of(objectArgs);
+        this.event = Optional.of(event);
+    }
+
     @JsonProperty
     public Optional<String> getSchemaName()
     {
