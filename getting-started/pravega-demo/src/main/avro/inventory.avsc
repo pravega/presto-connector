@@ -1,0 +1,10 @@
+{
+  "namespace": "io.pravega.demo.avro",
+  "type": "record",
+  "name": "Inventory",
+  "fields": [
+     {"name": "productId", "type": "long"},
+     {"name": "quantity", "type": "long"},
+     {"name": "originSrc", "type": "int"}
+ ]
+}
