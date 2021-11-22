@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Note: This class file is from PrestoDb
- * (rev a8968160e1840ac67a5f63def27d31c0ef0acde7)
- * https://github.com/prestodb/presto/blob/0.247/presto-kafka/src/test/java/com/facebook/presto/kafka/util/CodecSupplier.java
+ * Note: This class file is from Trinodb
+ * (rev 03d8e5abc686c5c4a9f96ca14db07e2aed880174)
+ * https://github.com/trinodb/trino/blob/359/plugin/trino-kafka/src/test/java/io/trino/plugin/kafka/util/CodecSupplier.java
  */
 
 package io.trino.plugin.pravega.integration;

@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Note: This file contains changes from Trinodb.  Specifically the decodeTree and locateNode methods
+ * (rev 03d8e5abc686c5c4a9f96ca14db07e2aed880174)
+ * https://github.com/trinodb/trino/blob/359/lib/trino-record-decoder/src/main/java/io/trino/decoder/json/JsonRowDecoder.java
  */
 
 package io.trino.plugin.pravega.decoder;

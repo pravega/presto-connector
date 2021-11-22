@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Note: This file contains some code from PrestoDb (majority of the "ResultsSession" implementation)
+ * Note: This file contains some code from PrestoDB (majority of the "ResultsSession" implementation)
  * (rev a8968160e1840ac67a5f63def27d31c0ef0acde7)
  * https://github.com/prestodb/presto/blob/0.247/presto-kafka/src/test/java/com/facebook/presto/kafka/util/KafkaLoader.java
  */
