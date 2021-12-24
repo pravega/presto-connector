@@ -137,40 +137,6 @@ public class PravegaSegmentManager
         return factory;
     }
 
-    EventStreamClientFactory getEventStreamClientFactory(String scope)
-    {
-        EventStreamClientFactory factory = eventStreamClientFactoryMap.get(scope);
-        if (factory == null) {
-            synchronized (this) {
-                factory = eventStreamClientFactoryMap.get(scope);
-                if (factory == null) {
-                    factory = EventStreamClientFactory.withScope(scope, clientConfig);
-                    if (eventStreamClientFactoryMap.putIfAbsent(scope, factory) != null) {
-                        throw new RuntimeException("unexpected concurrent create of event stream factory");
-                    }
-                }
-            }
-        }
-        return factory;
-    }
-
-    ReaderGroupManager readerGroupManager(String scope)
-    {
-        ReaderGroupManager readerGroupManager = scopedReaderGroupManagerMap.get(scope);
-        if (readerGroupManager == null) {
-            synchronized (this) {
-                readerGroupManager = scopedReaderGroupManagerMap.get(scope);
-                if (readerGroupManager == null) {
-                    readerGroupManager = ReaderGroupManager.withScope(scope, clientConfig);
-                    if (scopedReaderGroupManagerMap.putIfAbsent(scope, readerGroupManager) != null) {
-                        throw new RuntimeException("unexpected concurrent create of reader group manager");
-                    }
-                }
-            }
-        }
-        return readerGroupManager;
-    }
-
     SerializerConfig serializerConfig(String groupId)
     {
         return SerializerConfig.builder()

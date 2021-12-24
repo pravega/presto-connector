@@ -18,9 +18,6 @@ package io.trino.plugin.pravega;
 
 public enum ReaderType
 {
-    SEGMENT_RANGE             /* 1 split handles all segments within a stream cut */,
     SEGMENT_RANGE_PER_SPLIT   /* segments for stream cut are given out to different splits */,
-    EVENT_STREAM              /* stream oriented reading (vs. segments) */,
-    SINGLE_GROUP_EVENT_STREAM /* stream oriented reading (vs. segments) all readers in same group */,
     KVT                       /* key value table */,
 }
